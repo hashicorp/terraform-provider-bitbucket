@@ -35,8 +35,7 @@ type BitbucketClient struct {
 	HTTPClient *http.Client
 }
 
-func (c *BitbucketClient) Do(method, endpoint string, payload *bytes.Buffer) (*http.Response, error) {
-
+func (c *BitbucketClient) Do(method, endpoint, contentType string, payload *bytes.Buffer) (*http.Response, error) {
 	absoluteendpoint := BitbucketEndpoint + endpoint
 	log.Printf("[DEBUG] Sending request to %s %s", method, absoluteendpoint)
 
@@ -56,7 +55,7 @@ func (c *BitbucketClient) Do(method, endpoint string, payload *bytes.Buffer) (*h
 
 	if payload != nil {
 		// Can cause bad request when putting default reviews if set.
-		req.Header.Add("Content-Type", "application/json")
+		req.Header.Add("Content-Type", contentType)
 	}
 
 	req.Close = true
@@ -87,22 +86,31 @@ func (c *BitbucketClient) Do(method, endpoint string, payload *bytes.Buffer) (*h
 	return resp, err
 }
 
+func (c *BitbucketClient) DoJson(method, endpoint string, payload *bytes.Buffer) (*http.Response, error) {
+	return c.Do(method, endpoint, "application/json", payload)
+}
+
 func (c *BitbucketClient) Get(endpoint string) (*http.Response, error) {
-	return c.Do("GET", endpoint, nil)
+	return c.DoJson("GET", endpoint, nil)
 }
 
 func (c *BitbucketClient) Post(endpoint string, jsonpayload *bytes.Buffer) (*http.Response, error) {
-	return c.Do("POST", endpoint, jsonpayload)
+	return c.DoJson("POST", endpoint, jsonpayload)
 }
 
 func (c *BitbucketClient) Put(endpoint string, jsonpayload *bytes.Buffer) (*http.Response, error) {
-	return c.Do("PUT", endpoint, jsonpayload)
+	return c.DoJson("PUT", endpoint, jsonpayload)
 }
 
 func (c *BitbucketClient) PutOnly(endpoint string) (*http.Response, error) {
-	return c.Do("PUT", endpoint, nil)
+	return c.DoJson("PUT", endpoint, nil)
 }
 
 func (c *BitbucketClient) Delete(endpoint string) (*http.Response, error) {
-	return c.Do("DELETE", endpoint, nil)
+	return c.DoJson("DELETE", endpoint, nil)
+}
+
+// API version 1.0 does not use/support "application/json" on all endpoints
+func (c *BitbucketClient) PostFormEncoded(endpoint string, jsonpayload *bytes.Buffer) (*http.Response, error) {
+	return c.Do("POST", endpoint, "application/x-www-form-urlencoded", jsonpayload)
 }
