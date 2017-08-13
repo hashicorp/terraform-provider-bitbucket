@@ -24,6 +24,7 @@ type Repository struct {
 	Language    string `json:"language,omitempty"`
 	Description string `json:"description,omitempty"`
 	Name        string `json:"name,omitempty"`
+	Slug        string `json:"slug,omitempty"`
 	UUID        string `json:"uuid,omitempty"`
 	Project     struct {
 		Key string `json:"key,omitempty"`
@@ -101,6 +102,10 @@ func resourceRepository() *schema.Resource {
 				Type:     schema.TypeString,
 				Required: true,
 			},
+			"slug": &schema.Schema{
+				Type:     schema.TypeString,
+				Optional: true,
+			},
 		},
 	}
 }
@@ -108,6 +113,7 @@ func resourceRepository() *schema.Resource {
 func newRepositoryFromResource(d *schema.ResourceData) *Repository {
 	repo := &Repository{
 		Name:        d.Get("name").(string),
+		Slug:        d.Get("slug").(string),
 		Language:    d.Get("language").(string),
 		IsPrivate:   d.Get("is_private").(bool),
 		Description: d.Get("description").(string),
@@ -132,9 +138,15 @@ func resourceRepositoryUpdate(d *schema.ResourceData, m interface{}) error {
 	enc := json.NewEncoder(jsonpayload)
 	enc.Encode(repository)
 
+	var repoSlug string
+	repoSlug = d.Get("slug").(string)
+	if repoSlug == "" {
+		repoSlug = d.Get("name").(string)
+	}
+
 	_, err := client.Put(fmt.Sprintf("2.0/repositories/%s/%s",
 		d.Get("owner").(string),
-		d.Get("name").(string),
+		repoSlug,
 	), jsonpayload)
 
 	if err != nil {
@@ -154,25 +166,37 @@ func resourceRepositoryCreate(d *schema.ResourceData, m interface{}) error {
 		return err
 	}
 
+	var repoSlug string
+	repoSlug = d.Get("slug").(string)
+	if repoSlug == "" {
+		repoSlug = d.Get("name").(string)
+	}
+
 	_, err = client.Post(fmt.Sprintf("2.0/repositories/%s/%s",
 		d.Get("owner").(string),
-		d.Get("name").(string),
+		repoSlug,
 	), bytes.NewBuffer(bytedata))
 
 	if err != nil {
 		return err
 	}
 
-	d.SetId(string(fmt.Sprintf("%s/%s", d.Get("owner").(string), d.Get("name").(string))))
+	d.SetId(string(fmt.Sprintf("%s/%s", d.Get("owner").(string), repoSlug)))
 
 	return resourceRepositoryRead(d, m)
 }
 func resourceRepositoryRead(d *schema.ResourceData, m interface{}) error {
 
+	var repoSlug string
+	repoSlug = d.Get("slug").(string)
+	if repoSlug == "" {
+		repoSlug = d.Get("name").(string)
+	}
+
 	client := m.(*BitbucketClient)
 	repo_req, _ := client.Get(fmt.Sprintf("2.0/repositories/%s/%s",
 		d.Get("owner").(string),
-		d.Get("name").(string),
+		repoSlug,
 	))
 
 	if repo_req.StatusCode == 200 {
@@ -194,6 +218,7 @@ func resourceRepositoryRead(d *schema.ResourceData, m interface{}) error {
 		d.Set("has_wiki", repo.HasWiki)
 		d.Set("has_issues", repo.HasIssues)
 		d.Set("name", repo.Name)
+		d.Set("slug", repo.Slug)
 		d.Set("language", repo.Language)
 		d.Set("fork_policy", repo.ForkPolicy)
 		d.Set("website", repo.Website)
@@ -213,10 +238,17 @@ func resourceRepositoryRead(d *schema.ResourceData, m interface{}) error {
 }
 
 func resourceRepositoryDelete(d *schema.ResourceData, m interface{}) error {
+
+	var repoSlug string
+	repoSlug = d.Get("slug").(string)
+	if repoSlug == "" {
+		repoSlug = d.Get("name").(string)
+	}
+
 	client := m.(*BitbucketClient)
 	_, err := client.Delete(fmt.Sprintf("2.0/repositories/%s/%s",
 		d.Get("owner").(string),
-		d.Get("name").(string),
+		repoSlug,
 	))
 
 	return err
