@@ -35,6 +35,33 @@ func TestAccBitbucketRepository_basic(t *testing.T) {
 	})
 }
 
+func TestAccBitbucketRepository_camelcase(t *testing.T) {
+	var repo Repository
+
+	testUser := os.Getenv("BITBUCKET_USERNAME")
+	testAccBitbucketRepositoryConfig := fmt.Sprintf(`
+		resource "bitbucket_repository" "test_repo" {
+			owner = "%s"
+			name = "TestRepoForRepositoryTest"
+			slug = "test-repo-for-repository-test"
+		}
+	`, testUser)
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckBitbucketRepositoryDestroy,
+		Steps: []resource.TestStep{
+			resource.TestStep{
+				Config: testAccBitbucketRepositoryConfig,
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckBitbucketRepositoryExists("bitbucket_repository.test_repo", &repo),
+				),
+			},
+		},
+	})
+}
+
 func testAccCheckBitbucketRepositoryDestroy(s *terraform.State) error {
 	client := testAccProvider.Meta().(*BitbucketClient)
 	rs, ok := s.RootModule().Resources["bitbucket_repository.test_repo"]

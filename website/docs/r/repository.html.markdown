@@ -23,13 +23,26 @@ resource "bitbucket_repository" "infrastructure" {
 }
 ```
 
+If you want to create a repository with a CamelCase name, you should provide
+a seperate slug
+
+```hcl
+# Manage your repository
+resource "bitbucket_repository" "infrastructure" {
+  owner = "myteam"
+  name  = "TerraformCode"
+  slug  = "terraform-code"
+}
+```
+
 ## Argument Reference
 
 The following arguments are supported:
 
 * `owner` - (Required) The owner of this repository. Can be you or any team you
   have write access to.
-* `name` - (Optional) The name of the repository.
+* `name` - (Required) The name of the repository.
+* `slug` - (Optional) The slug of the repository.
 * `scm` - (Optional) What SCM you want to use. Valid options are hg or git.
   Defaults to git.
 * `is_private` - (Optional) If this should be private or not. Defaults to `true`.
