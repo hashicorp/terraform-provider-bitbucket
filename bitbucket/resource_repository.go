@@ -218,7 +218,9 @@ func resourceRepositoryRead(d *schema.ResourceData, m interface{}) error {
 		d.Set("has_wiki", repo.HasWiki)
 		d.Set("has_issues", repo.HasIssues)
 		d.Set("name", repo.Name)
-		d.Set("slug", repo.Slug)
+		if repo.Slug != "" && repo.Name != repo.Slug {
+			d.Set("slug", repo.Slug)
+		}
 		d.Set("language", repo.Language)
 		d.Set("fork_policy", repo.ForkPolicy)
 		d.Set("website", repo.Website)
