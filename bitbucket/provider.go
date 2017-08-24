@@ -27,7 +27,6 @@ func Provider() terraform.ResourceProvider {
 			"bitbucket_default_reviewers": resourceDefaultReviewers(),
 			"bitbucket_repository":        resourceRepository(),
 			"bitbucket_group":             resourceGroup(),
-			"bitbucket_group_member":      resourceGroupMember(),
 		},
 	}
 }
