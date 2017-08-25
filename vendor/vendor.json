@@ -408,6 +408,13 @@
 			"versionExact": "v0.10.0"
 		},
 		{
+			"checksumSHA1": "KPNvqyfFKVrMILCEc4ZIexWJ+Ys=",
+			"path": "github.com/hashicorp/terraform/helper/acctest",
+			"revision": "8e2583055467b80a6ee2ad043e080fffca089fbd",
+			"revisionTime": "2017-06-26T18:23:46Z",
+			"version": "v0.10.0"
+		},
+		{
 			"checksumSHA1": "uT6Q9RdSRAkDjyUgQlJ2XKJRab4=",
 			"path": "github.com/hashicorp/terraform/helper/config",
 			"revision": "2041053ee9444fa8175a298093b55a89586a1823",
