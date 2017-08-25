@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 
 	"github.com/hashicorp/terraform/helper/schema"
+	"strings"
 )
 
 type CloneUrl struct {
@@ -186,6 +187,16 @@ func resourceRepositoryCreate(d *schema.ResourceData, m interface{}) error {
 	return resourceRepositoryRead(d, m)
 }
 func resourceRepositoryRead(d *schema.ResourceData, m interface{}) error {
+	id := d.Id()
+	if id != "" {
+		idparts := strings.Split(id, "/")
+		if len(idparts) == 2 {
+			d.Set("owner", idparts[0])
+			d.Set("slug", idparts[1])
+		} else {
+			return fmt.Errorf("Incorrect ID format, should match `owner/slug`")
+		}
+	}
 
 	var repoSlug string
 	repoSlug = d.Get("slug").(string)
