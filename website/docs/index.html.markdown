@@ -8,7 +8,7 @@ description: |-
 
 # Bitbucket Provider
 
-The Bitbucket provider allows you to manage resources including repositories,
+The Bitbucket provider allows you to manage resources including repositories, groups,
 webhooks, and default reviewers.
 
 Use the navigation to the left to read about the available resources.
