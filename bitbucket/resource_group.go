@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 
 	"github.com/hashicorp/terraform/helper/schema"
+	"strings"
 )
 
 type GroupMember struct {
@@ -198,10 +199,26 @@ func resourceGroupCreate(d *schema.ResourceData, m interface{}) error {
 }
 
 func resourceGroupRead(d *schema.ResourceData, m interface{}) error {
+	id := d.Id()
+	if id != "" {
+		idparts := strings.Split(id, "/")
+		if len(idparts) == 2 {
+			d.Set("accountname", idparts[0])
+			d.Set("slug", idparts[1])
+		} else {
+			return fmt.Errorf("Incorrect ID format, should match `accountname/slug`")
+		}
+	}
+
+	slug := d.Get("slug").(string)
+	if slug == "" {
+		slug = d.Get("name").(string)
+	}
+
 	client := m.(*BitbucketClient)
 	response, _ := client.Get(fmt.Sprintf("1.0/groups/%s/%s",
 		d.Get("accountname").(string),
-		d.Get("slug").(string),
+		slug,
 	))
 
 	if response.StatusCode != 200 {
