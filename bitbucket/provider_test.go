@@ -31,9 +31,9 @@ func TestProvider_impl(t *testing.T) {
 
 func testAccPreCheck(t *testing.T) {
 	if v := os.Getenv("BITBUCKET_USERNAME"); v == "" {
-		t.Fatal("BITBUCKET_USERNAME must be set for acceptence tests")
+		t.Fatal("BITBUCKET_USERNAME must be set for acceptance tests")
 	}
 	if v := os.Getenv("BITBUCKET_PASSWORD"); v == "" {
-		t.Fatal("BITBUCKET_PASSWORD must be set for acceptence tests")
+		t.Fatal("BITBUCKET_PASSWORD must be set for acceptance tests")
 	}
 }
