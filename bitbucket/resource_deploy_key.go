@@ -111,10 +111,10 @@ func resourceDeployKeyRead(d *schema.ResourceData, m interface{}) error {
 	deployKey_req, _ := client.Get(fmt.Sprintf("1.0/repositories/%s/%s/deploy-keys/%s",
 		d.Get("owner").(string),
 		d.Get("repository").(string),
-		url.PathEscape(d.Id()),
+		d.Id(),
 	))
 
-	log.Printf("ID: %s", url.PathEscape(d.Id()))
+	log.Printf("[DEBUG] ID: %s", d.Id())
 
 	if deployKey_req.StatusCode == 200 {
 		var deployKey DeployKey
@@ -149,7 +149,7 @@ func resourceDeployKeyUpdate(d *schema.ResourceData, m interface{}) error {
 	_, err = client.Put(fmt.Sprintf("1.0/repositories/%s/%s/deploy-keys/%s",
 		d.Get("owner").(string),
 		d.Get("repository").(string),
-		url.PathEscape(d.Id()),
+		d.Id(),
 	), bytes.NewBuffer(payload))
 
 	if err != nil {
