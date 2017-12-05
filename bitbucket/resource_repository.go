@@ -106,6 +106,7 @@ func resourceRepository() *schema.Resource {
 			"slug": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
+				Computed: true,
 			},
 		},
 	}
