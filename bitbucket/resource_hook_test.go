@@ -24,6 +24,7 @@ func TestAccBitbucketHook_basic(t *testing.T) {
 			repository = "${bitbucket_repository.test_repo.name}"
 			description = "Test hook for terraform"
 			url = "https://httpbin.org"
+			skip_cert_verification = true
 			events = [
 				"repo:push",
 			]
