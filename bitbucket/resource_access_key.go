@@ -25,9 +25,6 @@ func resourceAccessKey() *schema.Resource {
 		Delete: resourceAccessKeyDetele,
 		Read:   resourceAccessKeyRead,
 		Update: resourceAccessKeyUpdate,
-		Importer: &schema.ResourceImporter{
-			State: schema.ImportStatePassthrough,
-		},
 
 		Schema: map[string]*schema.Schema{
 			"owner": &schema.Schema{
