@@ -23,8 +23,8 @@ func Provider() terraform.ResourceProvider {
 		},
 		ConfigureFunc: providerConfigure,
 		DataSourcesMap: map[string]*schema.Resource{
-			//			"bitbucket_access_key": dataAccessKey(),
-			"bitbucket_user_v1": dataSourceUserV1(),
+			"bitbucket_access_key": dataAccessKey(),
+			"bitbucket_user_v1":    dataSourceUserV1(),
 		},
 		ResourcesMap: map[string]*schema.Resource{
 			"bitbucket_access_key":        resourceAccessKey(),

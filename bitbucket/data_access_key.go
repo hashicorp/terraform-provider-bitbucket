@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"net/url"
 
 	"github.com/hashicorp/terraform/helper/schema"
 )
@@ -21,12 +22,14 @@ func dataAccessKey() *schema.Resource {
 				Required: true,
 			},
 			"key": &schema.Schema{
-				Type:     schema.TypeString,
-				Optional: true,
+				Type: schema.TypeString,
+				//				Optional: true,
+				Required: true,
 			},
 			"label": &schema.Schema{
-				Type:     schema.TypeString,
-				Optional: true,
+				Type: schema.TypeString,
+				//				Optional: true,
+				Required: true,
 			},
 		},
 	}
@@ -35,8 +38,11 @@ func dataAccessKey() *schema.Resource {
 func dataAccessKeyRead(d *schema.ResourceData, m interface{}) error {
 	client := m.(*BitbucketClient)
 
-	akReq, err := client.Get(fmt.Sprintf("1.0/repositories/%s/%s/deploy-keys/%s", d.Get("owner"), d.Get("repository"), d.Get("pk")))
-
+	akReq, err := client.Get(fmt.Sprintf("1.0/repositories/%s/%s/deploy-keys/%s",
+		d.Get("owner"),
+		d.Get("repository"),
+		url.PathEscape(d.Id()),
+	))
 	if err != nil {
 		return err
 	}
@@ -54,7 +60,7 @@ func dataAccessKeyRead(d *schema.ResourceData, m interface{}) error {
 			return decodingerr
 		}
 
-		d.SetId(string(ak.Pk))
+		d.SetId(fmt.Sprintf("%d", ak.Pk))
 		d.Set("key", ak.Key)
 		d.Set("label", ak.Label)
 	}

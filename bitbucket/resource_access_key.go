@@ -7,16 +7,15 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"net/url"
-	//	"strings"
 
 	"github.com/hashicorp/terraform/helper/schema"
 )
 
-// Accessey foo bar
 type AccessKey struct {
-	Pk    int    `json:"pk"`
-	Key   string `json:"key"`
+	Pk    uint64 `json:"pk,omitempty"`
+	Key   string `json:"key,omitempty"`
 	Label string `json:"label"`
 }
 
@@ -24,9 +23,11 @@ func resourceAccessKey() *schema.Resource {
 	return &schema.Resource{
 		Create: resourceAccessKeyCreate,
 		Delete: resourceAccessKeyDetele,
-		Exists: resourceAccessKeyExists,
 		Read:   resourceAccessKeyRead,
 		Update: resourceAccessKeyUpdate,
+		Importer: &schema.ResourceImporter{
+			State: schema.ImportStatePassthrough,
+		},
 
 		Schema: map[string]*schema.Schema{
 			"owner": &schema.Schema{
@@ -40,6 +41,7 @@ func resourceAccessKey() *schema.Resource {
 			"key": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
+				ForceNew: true,
 			},
 			"label": &schema.Schema{
 				Type:     schema.TypeString,
@@ -49,66 +51,16 @@ func resourceAccessKey() *schema.Resource {
 	}
 }
 
-func resourceAccessKeyCreate(d *schema.ResourceData, m interface{}) error {
-	client := m.(*BitbucketClient)
-
-	f := url.Values{}
-	f.Set("key", url.PathEscape(d.Get("key").(string)))
-	f.Set("label", d.Get("label").(string))
-
-	endpoint := fmt.Sprintf("1.0/repositories/%s/%s/deploy-keys", d.Get("owner").(string), d.Get("repository").(string))
-	buffer := bytes.NewBufferString(f.Encode())
-	//	buffer := strings.NewReader(f.Encode())
-
-	fmt.Println(buffer)
-
-	akResp, err := client.Post(endpoint, buffer)
-
-	if err != nil {
-		return err
-	}
-
-	if akResp.StatusCode == 200 {
-		var ak AccessKey
-
-		body, err := ioutil.ReadAll(akResp.Body)
-		if err != nil {
-			return err
-		}
-
-		decodingerr := json.Unmarshal(body, &ak)
-		if decodingerr != nil {
-			return decodingerr
-		}
-
-		d.SetId(string(ak.Pk))
-		d.Set("key", ak.Key)
-		d.Set("label", ak.Label)
-	}
-
-	return nil
-}
-
-func resourceAccessKeyExists(d *schema.ResourceData, m interface{}) (bool, error) {
-	client := m.(*BitbucketClient)
-
-	akResp, err := client.Get(fmt.Sprintf("1.0/repositories/%s/%s/deploy-keys/%s", d.Get("owner").(string), d.Get("repository").(string), d.Get("pk")))
-
-	if err != nil {
-		return false, err
-	}
-
-	if akResp.StatusCode == 200 {
-		return true, nil
-	}
-
-	return false, nil
-}
-
 func resourceAccessKeyRead(d *schema.ResourceData, m interface{}) error {
 	client := m.(*BitbucketClient)
 
-	akReq, err := client.Get(fmt.Sprintf("1.0/repositories/%s/%s/deploy-keys/%s", d.Get("owner"), d.Get("repository"), d.Id()))
+	akReq, err := client.Get(fmt.Sprintf("1.0/repositories/%s/%s/deploy-keys/%s",
+		d.Get("owner"),
+		d.Get("repository"),
+		url.PathEscape(d.Id())),
+	)
+
+	log.Printf("ID: %s", url.PathEscape(d.Id()))
 
 	if err != nil {
 		return err
@@ -127,7 +79,51 @@ func resourceAccessKeyRead(d *schema.ResourceData, m interface{}) error {
 			return decodingerr
 		}
 
-		//		d.SetId(string(ak.Pk))
+		d.SetId(fmt.Sprintf("%d", ak.Pk))
+		d.Set("key", ak.Key)
+		d.Set("label", ak.Label)
+	}
+
+	return nil
+}
+
+func resourceAccessKeyCreate(d *schema.ResourceData, m interface{}) error {
+	client := m.(*BitbucketClient)
+
+	endpoint := fmt.Sprintf("1.0/repositories/%s/%s/deploy-keys",
+		d.Get("owner").(string),
+		d.Get("repository").(string),
+	)
+
+	jsonpayload, err := json.Marshal(&AccessKey{
+		Label: d.Get("label").(string),
+		Key:   d.Get("key").(string),
+	})
+	if err != nil {
+		return err
+	}
+
+	akResp, err := client.Post(endpoint, bytes.NewBuffer(jsonpayload))
+	if err != nil {
+		return err
+	}
+
+	if akResp.StatusCode == 200 {
+		var ak AccessKey
+
+		body, err := ioutil.ReadAll(akResp.Body)
+		if err != nil {
+			return err
+		}
+
+		decodingerr := json.Unmarshal(body, &ak)
+		if decodingerr != nil {
+			return decodingerr
+		}
+
+		log.Printf("[DEBUG] Access Key [%v]", ak)
+
+		d.SetId(fmt.Sprintf("%d", ak.Pk))
 		d.Set("key", ak.Key)
 		d.Set("label", ak.Label)
 	}
@@ -136,63 +132,57 @@ func resourceAccessKeyRead(d *schema.ResourceData, m interface{}) error {
 }
 
 func resourceAccessKeyUpdate(d *schema.ResourceData, m interface{}) error {
-	//	client := m.(*BitbucketClient)
+	client := m.(*BitbucketClient)
 
-	//	akReq, err := client.Get(fmt.Sprintf("1.0/repositories/%s/%s/deploy-keys/%s", d.Get("owner"), d.Get("repository"), d.Id()))
+	endpoint := fmt.Sprintf("1.0/repositories/%s/%s/deploy-keys/%s",
+		d.Get("owner").(string),
+		d.Get("repository").(string),
+		url.PathEscape(d.Id()),
+	)
 
-	//	if err != nil {
-	//		return err
-	//	}
+	jsonpayload, err := json.Marshal(&AccessKey{
+		Label: d.Get("label").(string),
+	})
+	if err != nil {
+		return err
+	}
 
-	//	if akReq.StatusCode == 200 {
-	//		var ak AccessKey
+	akResp, err := client.Put(endpoint, bytes.NewBuffer(jsonpayload))
+	if err != nil {
+		return err
+	}
 
-	//		body, err := ioutil.ReadAll(akReq.Body)
-	//		if err != nil {
-	//			return err
-	//		}
+	if akResp.StatusCode == 200 {
+		var ak AccessKey
 
-	//		decodingerr := json.Unmarshal(body, &ak)
-	//		if decodingerr != nil {
-	//			return decodingerr
-	//		}
+		body, err := ioutil.ReadAll(akResp.Body)
+		if err != nil {
+			return err
+		}
 
-	//		//		d.SetId(string(ak.Pk))
-	//		d.Set("key", ak.Key)
-	//		d.Set("label", ak.Label)
-	//	}
+		decodingerr := json.Unmarshal(body, &ak)
+		if decodingerr != nil {
+			return decodingerr
+		}
 
-	resourceAccessKeyRead(d, m)
+		log.Printf("[DEBUG] Access Key [%v]", ak)
+
+		d.SetId(fmt.Sprintf("%d", ak.Pk))
+		d.Set("key", ak.Key)
+		d.Set("label", ak.Label)
+	}
 
 	return nil
 }
 
 func resourceAccessKeyDetele(d *schema.ResourceData, m interface{}) error {
-	//	client := m.(*BitbucketClient)
+	client := m.(*BitbucketClient)
 
-	//	akReq, err := client.Get(fmt.Sprintf("1.0/repositories/%s/%s/deploy-keys/%s", d.Get("owner"), d.Get("repository"), d.Id()))
+	_, err := client.Delete(fmt.Sprintf("1.0/repositories/%s/%s/deploy-keys/%s",
+		d.Get("owner").(string),
+		d.Get("repository").(string),
+		url.PathEscape(d.Id())),
+	)
 
-	//	if err != nil {
-	//		return err
-	//	}
-
-	//	if akReq.StatusCode == 200 {
-	//		var ak AccessKey
-
-	//		body, err := ioutil.ReadAll(akReq.Body)
-	//		if err != nil {
-	//			return err
-	//		}
-
-	//		decodingerr := json.Unmarshal(body, &ak)
-	//		if decodingerr != nil {
-	//			return decodingerr
-	//		}
-
-	//		//		d.SetId(string(ak.Pk))
-	//		d.Set("key", ak.Key)
-	//		d.Set("label", ak.Label)
-	//	}
-
-	return nil
+	return err
 }
