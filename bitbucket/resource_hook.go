@@ -12,11 +12,12 @@ import (
 )
 
 type Hook struct {
-	Uuid        string   `json:"uuid,omitempty"`
-	Url         string   `json:"url,omitempty"`
-	Description string   `json:"description,omitempty"`
-	Active      bool     `json:"active,omitempty"`
-	Events      []string `json:"events,omitempty"`
+	Uuid                 string   `json:"uuid,omitempty"`
+	Url                  string   `json:"url,omitempty"`
+	Description          string   `json:"description,omitempty"`
+	Active               bool     `json:"active,omitempty"`
+	SkipCertVerification bool     `json:"skip_cert_verification,omitempty"`
+	Events               []string `json:"events,omitempty"`
 }
 
 func resourceHook() *schema.Resource {
@@ -61,6 +62,11 @@ func resourceHook() *schema.Resource {
 				Elem:     &schema.Schema{Type: schema.TypeString},
 				Set:      schema.HashString,
 			},
+			"skip_cert_verification": &schema.Schema{
+				Type:     schema.TypeBool,
+				Optional: true,
+				Default:  true,
+			},
 		},
 	}
 }
@@ -74,10 +80,11 @@ func createHook(d *schema.ResourceData) *Hook {
 	}
 
 	return &Hook{
-		Url:         d.Get("url").(string),
-		Description: d.Get("description").(string),
-		Active:      d.Get("active").(bool),
-		Events:      events,
+		Url:                  d.Get("url").(string),
+		Description:          d.Get("description").(string),
+		Active:               d.Get("active").(bool),
+		SkipCertVerification: d.Get("skip_cert_verification").(bool),
+		Events:               events,
 	}
 }
 
@@ -141,6 +148,7 @@ func resourceHookRead(d *schema.ResourceData, m interface{}) error {
 		d.Set("description", hook.Description)
 		d.Set("active", hook.Active)
 		d.Set("url", hook.Url)
+		d.Set("skip_cert_verification", hook.SkipCertVerification)
 
 		eventsList := make([]string, 0, len(hook.Events))
 
