@@ -472,6 +472,20 @@
 			"versionExact": "v0.10.0"
 		},
 		{
+			"checksumSHA1": "Fzbv+N7hFXOtrR6E7ZcHT3jEE9s=",
+			"path": "github.com/hashicorp/terraform/helper/structure",
+			"revision": "fce30c14f051bed407216117cd36394a8f78c401",
+			"revisionTime": "2018-06-06T15:57:40Z"
+		},
+		{
+			"checksumSHA1": "qsI85GvNukAIUv+kcy8CdgP7um8=",
+			"path": "github.com/hashicorp/terraform/helper/validation",
+			"revision": "2041053ee9444fa8175a298093b55a89586a1823",
+			"revisionTime": "2017-08-02T18:39:14Z",
+			"version": "v0.10.0",
+			"versionExact": "v0.10.0"
+		},
+		{
 			"checksumSHA1": "yFWmdS6yEJZpRJzUqd/mULqCYGk=",
 			"path": "github.com/hashicorp/terraform/moduledeps",
 			"revision": "5bcc1bae5925f44208a83279b6d4d250da01597b",
