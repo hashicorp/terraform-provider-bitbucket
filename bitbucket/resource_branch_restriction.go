@@ -16,6 +16,11 @@ type BranchRestriction struct {
 	Kind    string `json:"kind,omitempty"`
 	Pattern string `json:"pattern,omitempty"`
 	Value   int    `json:"value,omitempty"`
+	Users   []User `json:"users,omitempty"`
+}
+
+type User struct {
+	Username string `json:"username,omitempty"`
 }
 
 func resourceBranchRestriction() *schema.Resource {
@@ -58,6 +63,12 @@ func resourceBranchRestriction() *schema.Resource {
 				Type:     schema.TypeString,
 				Required: true,
 			},
+			"users": {
+				Type:     schema.TypeSet,
+				Elem:     &schema.Schema{Type: schema.TypeString},
+				Optional: true,
+				Set:      schema.HashString,
+			},
 			"value": {
 				Type:     schema.TypeInt,
 				Optional: true,
@@ -67,10 +78,18 @@ func resourceBranchRestriction() *schema.Resource {
 }
 
 func createBranchRestriction(d *schema.ResourceData) *BranchRestriction {
+
+	users := make([]User, 0, len(d.Get("users").(*schema.Set).List()))
+
+	for _, item := range d.Get("users").(*schema.Set).List() {
+		users = append(users, User{Username: item.(string)})
+	}
+
 	return &BranchRestriction{
 		Kind:    d.Get("kind").(string),
 		Pattern: d.Get("pattern").(string),
 		Value:   d.Get("value").(int),
+		Users:   users,
 	}
 }
 
@@ -135,6 +154,7 @@ func resourceBranchRestrictionsRead(d *schema.ResourceData, m interface{}) error
 		d.Set("kind", branchRestriction.Kind)
 		d.Set("pattern", branchRestriction.Pattern)
 		d.Set("value", branchRestriction.Value)
+		d.Set("users", branchRestriction.Users)
 	}
 
 	return nil
