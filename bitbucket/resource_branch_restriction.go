@@ -15,6 +15,7 @@ type BranchRestriction struct {
 	Id      int    `json:"id,omitempty"`
 	Kind    string `json:"kind,omitempty"`
 	Pattern string `json:"pattern,omitempty"`
+	Value   int    `json:"value,omitempty"`
 }
 
 func resourceBranchRestriction() *schema.Resource {
@@ -57,6 +58,10 @@ func resourceBranchRestriction() *schema.Resource {
 				Type:     schema.TypeString,
 				Required: true,
 			},
+			"value": {
+				Type:     schema.TypeInt,
+				Optional: true,
+			},
 		},
 	}
 }
@@ -65,6 +70,7 @@ func createBranchRestriction(d *schema.ResourceData) *BranchRestriction {
 	return &BranchRestriction{
 		Kind:    d.Get("kind").(string),
 		Pattern: d.Get("pattern").(string),
+		Value:   d.Get("value").(int),
 	}
 }
 
@@ -128,6 +134,7 @@ func resourceBranchRestrictionsRead(d *schema.ResourceData, m interface{}) error
 		d.SetId(string(fmt.Sprintf("%v", branchRestriction.Id)))
 		d.Set("kind", branchRestriction.Kind)
 		d.Set("pattern", branchRestriction.Pattern)
+		d.Set("value", branchRestriction.Value)
 	}
 
 	return nil
