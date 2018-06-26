@@ -12,15 +12,21 @@ import (
 )
 
 type BranchRestriction struct {
-	Id      int    `json:"id,omitempty"`
-	Kind    string `json:"kind,omitempty"`
-	Pattern string `json:"pattern,omitempty"`
-	Value   int    `json:"value,omitempty"`
-	Users   []User `json:"users,omitempty"`
+	Id      int     `json:"id,omitempty"`
+	Kind    string  `json:"kind,omitempty"`
+	Pattern string  `json:"pattern,omitempty"`
+	Value   int     `json:"value,omitempty"`
+	Users   []User  `json:"users,omitempty"`
+	Groups  []Group `json:"groups,omitempty"`
 }
 
 type User struct {
 	Username string `json:"username,omitempty"`
+}
+
+type Group struct {
+	Slug  string `json:"slug,omitempty"`
+	Owner User   `json:"owner,omitempty"`
 }
 
 func resourceBranchRestriction() *schema.Resource {
@@ -69,6 +75,23 @@ func resourceBranchRestriction() *schema.Resource {
 				Optional: true,
 				Set:      schema.HashString,
 			},
+			"groups": {
+				Type: schema.TypeSet,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"owner": {
+							Type:     schema.TypeString,
+							Required: true,
+						},
+						"slug": {
+							Type:     schema.TypeString,
+							Required: true,
+						},
+					},
+				},
+				Optional: true,
+			},
+
 			"value": {
 				Type:     schema.TypeInt,
 				Optional: true,
@@ -85,11 +108,19 @@ func createBranchRestriction(d *schema.ResourceData) *BranchRestriction {
 		users = append(users, User{Username: item.(string)})
 	}
 
+	groups := make([]Group, 0, len(d.Get("groups").(*schema.Set).List()))
+
+	for _, item := range d.Get("groups").(*schema.Set).List() {
+		m := item.(map[string]interface{})
+		groups = append(groups, Group{Owner: User{Username: m["owner"].(string)}, Slug: m["slug"].(string)})
+	}
+
 	return &BranchRestriction{
 		Kind:    d.Get("kind").(string),
 		Pattern: d.Get("pattern").(string),
 		Value:   d.Get("value").(int),
 		Users:   users,
+		Groups:  groups,
 	}
 }
 
@@ -155,6 +186,7 @@ func resourceBranchRestrictionsRead(d *schema.ResourceData, m interface{}) error
 		d.Set("pattern", branchRestriction.Pattern)
 		d.Set("value", branchRestriction.Value)
 		d.Set("users", branchRestriction.Users)
+		d.Set("groups", branchRestriction.Groups)
 	}
 
 	return nil
