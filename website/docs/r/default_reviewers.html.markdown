@@ -13,7 +13,7 @@ Provides support for setting up default reviewers for your repository.
 ## Example Usage
 
 ```hcl
-# Manage your repository
+# Manage your repositories default reviewers
 resource "bitbucket_default_reviewers" "infrastructure" {
   owner      = "myteam"
   repository = "terraform-code"
