@@ -193,6 +193,13 @@ func resourceHookExists(d *schema.ResourceData, m interface{}) (bool, error) {
 		))
 
 		if err != nil {
+			log.Printf("[DEBUG] Req: %+v, Err: %+v", hook_req, err)
+			// If the hook was not found, we get the message "is not a valid hook".
+			// Return nil so we can show that the hook is gone.
+			if hook_req.StatusCode == 404 {
+				return false, nil
+			}
+
 			panic(err)
 		}
 
