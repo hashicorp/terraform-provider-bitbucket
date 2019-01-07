@@ -29,40 +29,40 @@ func resourceHook() *schema.Resource {
 		Exists: resourceHookExists,
 
 		Schema: map[string]*schema.Schema{
-			"owner": &schema.Schema{
+			"owner": {
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
-			"repository": &schema.Schema{
+			"repository": {
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
-			"active": &schema.Schema{
+			"active": {
 				Type:     schema.TypeBool,
 				Optional: true,
 				Default:  true,
 			},
-			"url": &schema.Schema{
+			"url": {
 				Type:     schema.TypeString,
 				Required: true,
 			},
-			"uuid": &schema.Schema{
+			"uuid": {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"description": &schema.Schema{
+			"description": {
 				Type:     schema.TypeString,
 				Required: true,
 			},
-			"events": &schema.Schema{
+			"events": {
 				Type:     schema.TypeSet,
 				Required: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 				Set:      schema.HashString,
 			},
-			"skip_cert_verification": &schema.Schema{
+			"skip_cert_verification": {
 				Type:     schema.TypeBool,
 				Optional: true,
 				Default:  true,
