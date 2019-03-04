@@ -29,40 +29,40 @@ func resourceHook() *schema.Resource {
 		Exists: resourceHookExists,
 
 		Schema: map[string]*schema.Schema{
-			"owner": &schema.Schema{
+			"owner": {
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
-			"repository": &schema.Schema{
+			"repository": {
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
-			"active": &schema.Schema{
+			"active": {
 				Type:     schema.TypeBool,
 				Optional: true,
 				Default:  true,
 			},
-			"url": &schema.Schema{
+			"url": {
 				Type:     schema.TypeString,
 				Required: true,
 			},
-			"uuid": &schema.Schema{
+			"uuid": {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"description": &schema.Schema{
+			"description": {
 				Type:     schema.TypeString,
 				Required: true,
 			},
-			"events": &schema.Schema{
+			"events": {
 				Type:     schema.TypeSet,
 				Required: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 				Set:      schema.HashString,
 			},
-			"skip_cert_verification": &schema.Schema{
+			"skip_cert_verification": {
 				Type:     schema.TypeBool,
 				Optional: true,
 				Default:  true,
@@ -193,6 +193,13 @@ func resourceHookExists(d *schema.ResourceData, m interface{}) (bool, error) {
 		))
 
 		if err != nil {
+			log.Printf("[DEBUG] Req: %+v, Err: %+v", hook_req, err)
+			// If the hook was not found, we get the message "is not a valid hook".
+			// Return nil so we can show that the hook is gone.
+			if hook_req.StatusCode == 404 {
+				return false, nil
+			}
+
 			panic(err)
 		}
 
