@@ -16,6 +16,9 @@ type Reviewer struct {
 
 type PaginatedReviewers struct {
 	Values []Reviewer `json:"values,omitempty"`
+	Page   int        `json:"page,omitempty"`
+	Size   int        `json:"size,omitempty"`
+	Next   string     `json:"next,omitempty"`
 }
 
 func resourceDefaultReviewers() *schema.Resource {
@@ -70,32 +73,52 @@ func resourceDefaultReviewersCreate(d *schema.ResourceData, m interface{}) error
 	d.SetId(fmt.Sprintf("%s/%s/reviewers", d.Get("owner").(string), d.Get("repository").(string)))
 	return resourceDefaultReviewersRead(d, m)
 }
+
 func resourceDefaultReviewersRead(d *schema.ResourceData, m interface{}) error {
 	client := m.(*BitbucketClient)
 
-	reviewersResponse, err := client.Get(fmt.Sprintf("2.0/repositories/%s/%s/default-reviewers",
+	resourceURL := fmt.Sprintf("2.0/repositories/%s/%s/default-reviewers",
 		d.Get("owner").(string),
 		d.Get("repository").(string),
-	))
+	)
 
 	var reviewers PaginatedReviewers
+	var terraformReviewers []string
 
-	decoder := json.NewDecoder(reviewersResponse.Body)
-	err = decoder.Decode(&reviewers)
-	if err != nil {
-		return err
-	}
+	for {
+		reviewersResponse, err := client.Get(resourceURL)
+		if err != nil {
+			return err
+		}
 
-	terraformReviewers := make([]string, 0, len(reviewers.Values))
+		decoder := json.NewDecoder(reviewersResponse.Body)
+		err = decoder.Decode(&reviewers)
+		if err != nil {
+			return err
+		}
 
-	for _, reviewer := range reviewers.Values {
-		terraformReviewers = append(terraformReviewers, reviewer.Username)
+		for _, reviewer := range reviewers.Values {
+			terraformReviewers = append(terraformReviewers, reviewer.Username)
+		}
+
+		if reviewers.Next != "" {
+			nextPage := reviewers.Page + 1
+			resourceURL = fmt.Sprintf("2.0/repositories/%s/%s/default-reviewers?page=%d",
+				d.Get("owner").(string),
+				d.Get("repository").(string),
+				nextPage,
+			)
+			reviewers = PaginatedReviewers{}
+		} else {
+			break
+		}
 	}
 
 	d.Set("reviewers", terraformReviewers)
 
 	return nil
 }
+
 func resourceDefaultReviewersDelete(d *schema.ResourceData, m interface{}) error {
 	client := m.(*BitbucketClient)
 
