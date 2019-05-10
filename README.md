@@ -32,7 +32,25 @@ $ make build
 
 Using the provider
 ----------------------
-## Fill in for each provider
+
+Create repository:
+```terraform
+# Manage your repository
+resource "bitbucket_repository" "infrastructure" {
+  owner = "myteam"
+  name  = "terraform-code"
+}
+```
+
+Create project:
+```terraform
+# Manage your repository
+resource "bitbucket_project" "infrastructure" {
+  owner = "myteam"
+  name  = "terraform-project"
+	key   = "TERRAFORMPROJ"
+}
+```
 
 Developing the Provider
 ---------------------------
