@@ -33,22 +33,24 @@ $ make build
 Using the provider
 ----------------------
 
-Create repository:
 ```hcl
+# Configure the Bitbucket Provider
+provider "bitbucket" {
+  username = "GobBluthe"
+  password = "idoillusions" # you can also use app passwords
+}
+
 # Manage your repository
 resource "bitbucket_repository" "infrastructure" {
   owner = "myteam"
   name  = "terraform-code"
 }
-```
 
-Create project:
-```hcl
-# Manage your repository
+# Manage your project
 resource "bitbucket_project" "infrastructure" {
-  owner = "myteam"
+  owner = "myteam" # must be a team
   name  = "terraform-project"
-	key   = "TERRAFORMPROJ"
+  key   = "TERRAFORMPROJ"
 }
 ```
 
