@@ -76,6 +76,8 @@ $ make test
 
 In order to run the full suite of Acceptance tests, run `make testacc`.
 
+*Note:* Terraform needs TF_ACC env variable set to run acceptance tests
+
 *Note:* Acceptance tests create real resources, and often cost money to run.
 
 ```sh
