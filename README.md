@@ -34,7 +34,7 @@ Using the provider
 ----------------------
 
 Create repository:
-```terraform
+```hcl
 # Manage your repository
 resource "bitbucket_repository" "infrastructure" {
   owner = "myteam"
@@ -43,7 +43,7 @@ resource "bitbucket_repository" "infrastructure" {
 ```
 
 Create project:
-```terraform
+```hcl
 # Manage your repository
 resource "bitbucket_project" "infrastructure" {
   owner = "myteam"

@@ -28,6 +28,13 @@ resource "bitbucket_repository" "illusions" {
   scm        = "hg"
   is_private = true
 }
+
+resource "bitbucket_project" "project" {
+  owner      = "theleagueofmagicians" # must be a team
+  name       = "illusions-project"
+  key        = "ILLUSIONSPROJ"
+  is_private = true
+}
 ```
 
 ## Argument Reference
