@@ -6,8 +6,9 @@ import (
 	"fmt"
 	"io/ioutil"
 
-	"github.com/hashicorp/terraform/helper/schema"
 	"strings"
+
+	"github.com/hashicorp/terraform/helper/schema"
 )
 
 type CloneUrl struct {
@@ -36,6 +37,8 @@ type Repository struct {
 }
 
 func resourceRepository() *schema.Resource {
+	// fmt.Print("resourceRepository")
+
 	return &schema.Resource{
 		Create: resourceRepositoryCreate,
 		Update: resourceRepositoryUpdate,
