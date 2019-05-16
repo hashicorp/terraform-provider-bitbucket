@@ -30,12 +30,21 @@ const (
 )
 
 type BitbucketClient struct {
+	Server     string
 	Username   string
 	Password   string
 	HTTPClient *http.Client
 }
 
 func (c *BitbucketClient) Do(method, endpoint string, payload *bytes.Buffer) (*http.Response, error) {
+
+	if len(c.Server) > 0 {
+		log.Printf("Did provide server option %s", c.Server)
+
+	} else {
+		log.Printf("Using Default: %s", BitbucketEndpoint)
+
+	}
 
 	absoluteendpoint := BitbucketEndpoint + endpoint
 	log.Printf("[DEBUG] Sending request to %s %s", method, absoluteendpoint)

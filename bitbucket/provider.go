@@ -10,6 +10,11 @@ import (
 func Provider() terraform.ResourceProvider {
 	return &schema.Provider{
 		Schema: map[string]*schema.Schema{
+			"server": {
+				Required:    true,
+				Type:        schema.TypeString,
+				DefaultFunc: schema.EnvDefaultFunc("BITBUCKET_SERVER", nil),
+			},
 			"username": {
 				Required:    true,
 				Type:        schema.TypeString,
@@ -32,6 +37,7 @@ func Provider() terraform.ResourceProvider {
 
 func providerConfigure(d *schema.ResourceData) (interface{}, error) {
 	client := &BitbucketClient{
+		Server:     d.Get("server").(string),
 		Username:   d.Get("username").(string),
 		Password:   d.Get("password").(string),
 		HTTPClient: &http.Client{},
