@@ -277,10 +277,10 @@ func resourceRepositoryRead(d *schema.ResourceData, m interface{}) error {
 				d.Set("clone_ssh", clone_url.Href)
 			}
 		}
-		log.Printf("[DEBUG] got 200 response: %s, ", d.Get("owner").(string), repoSlug)
+		log.Printf("[DEBUG] got 200 response: %s, %s", d.Get("owner").(string), repoSlug)
 
 	} else {
-		log.Printf("[DEBUG] did not get 200 response: %s, ", d.Get("owner").(string), repoSlug)
+		log.Printf("[DEBUG] did not get 200 response: %s, %s", d.Get("owner").(string), repoSlug)
 	}
 
 	return nil
