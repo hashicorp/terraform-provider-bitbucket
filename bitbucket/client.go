@@ -8,6 +8,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"strings"
 )
 
 // Error represents a error from the bitbucket api.
@@ -26,11 +27,11 @@ func (e Error) Error() string {
 
 const (
 	// BitbucketEndpoint is the fqdn used to talk to bitbucket
-	BitbucketEndpoint string = "https://api.bitbucket.org/"
+	BitbucketEndpoint string = "https://api.bitbucket.org/2.0/"
 )
 
 type BitbucketClient struct {
-	Server     string
+	Endpoint   string
 	Username   string
 	Password   string
 	HTTPClient *http.Client
@@ -38,15 +39,21 @@ type BitbucketClient struct {
 
 func (c *BitbucketClient) Do(method, endpoint string, payload *bytes.Buffer) (*http.Response, error) {
 
-	if len(c.Server) > 0 {
-		log.Printf("Did provide server option %s", c.Server)
+	if strings.Contains(c.Endpoint, "api.bitbucket.org") {
+		log.Printf("[DEBUG] contains api.bitbucket.org: %s", BitbucketEndpoint)
 
 	} else {
-		log.Printf("Using Default: %s", BitbucketEndpoint)
 
 	}
 
-	absoluteendpoint := BitbucketEndpoint + endpoint
+	if c.Endpoint == "" {
+		log.Printf("[DEBUG] server not specified setting default: %s", BitbucketEndpoint)
+		c.Endpoint = BitbucketEndpoint
+	} else {
+		log.Printf("[DEBUG] Using: %s", c.Endpoint)
+	}
+
+	absoluteendpoint := c.Endpoint + endpoint
 	log.Printf("[DEBUG] Sending request to %s %s", method, absoluteendpoint)
 
 	var bodyreader io.Reader

@@ -50,7 +50,7 @@ func resourceDefaultReviewersCreate(d *schema.ResourceData, m interface{}) error
 	client := m.(*BitbucketClient)
 
 	for _, user := range d.Get("reviewers").(*schema.Set).List() {
-		reviewerResp, err := client.PutOnly(fmt.Sprintf("2.0/repositories/%s/%s/default-reviewers/%s",
+		reviewerResp, err := client.PutOnly(fmt.Sprintf("repositories/%s/%s/default-reviewers/%s",
 			d.Get("owner").(string),
 			d.Get("repository").(string),
 			user,
@@ -73,7 +73,7 @@ func resourceDefaultReviewersCreate(d *schema.ResourceData, m interface{}) error
 func resourceDefaultReviewersRead(d *schema.ResourceData, m interface{}) error {
 	client := m.(*BitbucketClient)
 
-	reviewersResponse, err := client.Get(fmt.Sprintf("2.0/repositories/%s/%s/default-reviewers",
+	reviewersResponse, err := client.Get(fmt.Sprintf("repositories/%s/%s/default-reviewers",
 		d.Get("owner").(string),
 		d.Get("repository").(string),
 	))
@@ -100,7 +100,7 @@ func resourceDefaultReviewersDelete(d *schema.ResourceData, m interface{}) error
 	client := m.(*BitbucketClient)
 
 	for _, user := range d.Get("reviewers").(*schema.Set).List() {
-		resp, err := client.Delete(fmt.Sprintf("2.0/repositories/%s/%s/default-reviewers/%s",
+		resp, err := client.Delete(fmt.Sprintf("repositories/%s/%s/default-reviewers/%s",
 			d.Get("owner").(string),
 			d.Get("repository").(string),
 			user.(string),

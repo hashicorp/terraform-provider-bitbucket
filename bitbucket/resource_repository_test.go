@@ -69,7 +69,7 @@ func testAccCheckBitbucketRepositoryDestroy(s *terraform.State) error {
 		return fmt.Errorf("Not found %s", "bitbucket_repository.test_repo")
 	}
 
-	response, _ := client.Get(fmt.Sprintf("2.0/repositories/%s/%s", rs.Primary.Attributes["owner"], rs.Primary.Attributes["name"]))
+	response, _ := client.Get(fmt.Sprintf("repositories/%s/%s", rs.Primary.Attributes["owner"], rs.Primary.Attributes["name"]))
 
 	if response.StatusCode != 404 {
 		return fmt.Errorf("Repository still exists")

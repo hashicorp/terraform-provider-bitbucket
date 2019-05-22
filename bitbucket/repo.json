@@ -1,0 +1,13 @@
+{
+
+     "name": "ngs-test-repo",
+    
+     "project": {
+    
+          "key": "NGSTEM"
+    
+      },
+    
+     "public": true
+    
+}

@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"log"
 
 	"strings"
 
@@ -149,13 +150,28 @@ func resourceRepositoryUpdate(d *schema.ResourceData, m interface{}) error {
 		repoSlug = d.Get("name").(string)
 	}
 
-	_, err := client.Put(fmt.Sprintf("2.0/repositories/%s/%s",
-		d.Get("owner").(string),
-		repoSlug,
-	), jsonpayload)
+	var projectKey string
+	projectKey = d.Get("project_key").(string)
+	if projectKey == "" {
+		projectKey = d.Get("name").(string)
+	}
 
-	if err != nil {
-		return err
+	if strings.Contains(client.Endpoint, "api.bitbucket.org") {
+		_, err := client.Put(fmt.Sprintf("repositories/%s/%s",
+			d.Get("owner").(string),
+			repoSlug,
+		), jsonpayload)
+		if err != nil {
+			return err
+		}
+	} else {
+		_, err := client.Put(fmt.Sprintf("projects/%s/repos/%s",
+			projectKey,
+			repoSlug,
+		), jsonpayload)
+		if err != nil {
+			return err
+		}
 	}
 
 	return resourceRepositoryRead(d, m)
@@ -176,11 +192,23 @@ func resourceRepositoryCreate(d *schema.ResourceData, m interface{}) error {
 	if repoSlug == "" {
 		repoSlug = d.Get("name").(string)
 	}
-
-	_, err = client.Post(fmt.Sprintf("2.0/repositories/%s/%s",
-		d.Get("owner").(string),
-		repoSlug,
-	), bytes.NewBuffer(bytedata))
+	var projectKey string
+	projectKey = d.Get("project_key").(string)
+	if projectKey == "" {
+		projectKey = d.Get("name").(string)
+	}
+	// handle bitbucket.org
+	if strings.Contains(client.Endpoint, "api.bitbucket.org") {
+		_, err = client.Post(fmt.Sprintf("repositories/%s/%s",
+			d.Get("owner").(string),
+			repoSlug,
+		), bytes.NewBuffer(bytedata))
+	} else {
+		// handle bitbucket server
+		_, err = client.Post(fmt.Sprintf("projects/%s/repos",
+			projectKey,
+		), bytes.NewBuffer(bytedata))
+	}
 
 	if err != nil {
 		return err
@@ -209,7 +237,7 @@ func resourceRepositoryRead(d *schema.ResourceData, m interface{}) error {
 	}
 
 	client := m.(*BitbucketClient)
-	repo_req, _ := client.Get(fmt.Sprintf("2.0/repositories/%s/%s",
+	repo_req, _ := client.Get(fmt.Sprintf("repositories/%s/%s",
 		d.Get("owner").(string),
 		repoSlug,
 	))
@@ -249,24 +277,59 @@ func resourceRepositoryRead(d *schema.ResourceData, m interface{}) error {
 				d.Set("clone_ssh", clone_url.Href)
 			}
 		}
+		log.Printf("[DEBUG] got 200 response: %s, ", d.Get("owner").(string), repoSlug)
+
+	} else {
+		log.Printf("[DEBUG] did not get 200 response: %s, ", d.Get("owner").(string), repoSlug)
 	}
 
 	return nil
 }
 
 func resourceRepositoryDelete(d *schema.ResourceData, m interface{}) error {
+	repo := newRepositoryFromResource(d)
+
+	_, err := json.Marshal(repo)
+
+	if err != nil {
+		return err
+	}
 
 	var repoSlug string
 	repoSlug = d.Get("slug").(string)
 	if repoSlug == "" {
 		repoSlug = d.Get("name").(string)
 	}
+	var projectKey string
+	projectKey = d.Get("project_key").(string)
+	if projectKey == "" {
+		projectKey = d.Get("name").(string)
+	}
 
 	client := m.(*BitbucketClient)
-	_, err := client.Delete(fmt.Sprintf("2.0/repositories/%s/%s",
-		d.Get("owner").(string),
-		repoSlug,
-	))
 
+	// handle bitbucket.org
+
+	if strings.Contains(client.Endpoint, "api.bitbucket.org") {
+
+		_, err := client.Delete(fmt.Sprintf("repositories/%s/%s",
+			d.Get("owner").(string),
+			repoSlug,
+		))
+
+		if err != nil {
+			return err
+		}
+
+	} else {
+		_, err := client.Delete(fmt.Sprintf("projects/%s/repos/%s",
+			projectKey,
+			repoSlug,
+		))
+
+		if err != nil {
+			return err
+		}
+	}
 	return err
 }

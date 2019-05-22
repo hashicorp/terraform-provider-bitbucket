@@ -97,7 +97,7 @@ func resourceHookCreate(d *schema.ResourceData, m interface{}) error {
 		return err
 	}
 
-	hook_req, err := client.Post(fmt.Sprintf("2.0/repositories/%s/%s/hooks",
+	hook_req, err := client.Post(fmt.Sprintf("repositories/%s/%s/hooks",
 		d.Get("owner").(string),
 		d.Get("repository").(string),
 	), bytes.NewBuffer(payload))
@@ -123,7 +123,7 @@ func resourceHookCreate(d *schema.ResourceData, m interface{}) error {
 func resourceHookRead(d *schema.ResourceData, m interface{}) error {
 	client := m.(*BitbucketClient)
 
-	hook_req, _ := client.Get(fmt.Sprintf("2.0/repositories/%s/%s/hooks/%s",
+	hook_req, _ := client.Get(fmt.Sprintf("repositories/%s/%s/hooks/%s",
 		d.Get("owner").(string),
 		d.Get("repository").(string),
 		url.PathEscape(d.Id()),
@@ -170,7 +170,7 @@ func resourceHookUpdate(d *schema.ResourceData, m interface{}) error {
 		return err
 	}
 
-	_, err = client.Put(fmt.Sprintf("2.0/repositories/%s/%s/hooks/%s",
+	_, err = client.Put(fmt.Sprintf("repositories/%s/%s/hooks/%s",
 		d.Get("owner").(string),
 		d.Get("repository").(string),
 		url.PathEscape(d.Id()),
@@ -186,7 +186,7 @@ func resourceHookUpdate(d *schema.ResourceData, m interface{}) error {
 func resourceHookExists(d *schema.ResourceData, m interface{}) (bool, error) {
 	client := m.(*BitbucketClient)
 	if _, okay := d.GetOk("uuid"); okay {
-		hook_req, err := client.Get(fmt.Sprintf("2.0/repositories/%s/%s/hooks/%s",
+		hook_req, err := client.Get(fmt.Sprintf("repositories/%s/%s/hooks/%s",
 			d.Get("owner").(string),
 			d.Get("repository").(string),
 			url.PathEscape(d.Id()),
@@ -216,7 +216,7 @@ func resourceHookExists(d *schema.ResourceData, m interface{}) (bool, error) {
 
 func resourceHookDelete(d *schema.ResourceData, m interface{}) error {
 	client := m.(*BitbucketClient)
-	_, err := client.Delete(fmt.Sprintf("2.0/repositories/%s/%s/hooks/%s",
+	_, err := client.Delete(fmt.Sprintf("repositories/%s/%s/hooks/%s",
 		d.Get("owner").(string),
 		d.Get("repository").(string),
 		url.PathEscape(d.Id()),
