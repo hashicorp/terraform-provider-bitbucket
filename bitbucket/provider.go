@@ -10,11 +10,6 @@ import (
 func Provider() terraform.ResourceProvider {
 	return &schema.Provider{
 		Schema: map[string]*schema.Schema{
-			"endpoint": {
-				Optional:    true,
-				Type:        schema.TypeString,
-				DefaultFunc: schema.EnvDefaultFunc("BITBUCKET_ENDPOINT", nil),
-			},
 			"username": {
 				Required:    true,
 				Type:        schema.TypeString,
@@ -24,6 +19,11 @@ func Provider() terraform.ResourceProvider {
 				Type:        schema.TypeString,
 				Required:    true,
 				DefaultFunc: schema.EnvDefaultFunc("BITBUCKET_PASSWORD", nil),
+			},
+			"endpoint": {
+				Required:    true,
+				Type:        schema.TypeString,
+				DefaultFunc: schema.EnvDefaultFunc("BITBUCKET_ENDPOINT", nil),
 			},
 		},
 		ConfigureFunc: providerConfigure,

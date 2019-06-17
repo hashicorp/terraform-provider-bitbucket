@@ -7,7 +7,8 @@ default: build
 
 build: fmtcheck
 	go install
-
+	cp ~/go/bin/terraform-provider-bitbucket ~/Documents/GitHub/iaas-gitrepos-terraform
+	cp ~/go/bin/terraform-provider-bitbucket ~/hashicorp/
 
 test: fmtcheck
 	go test -i $(TEST) || exit 1
