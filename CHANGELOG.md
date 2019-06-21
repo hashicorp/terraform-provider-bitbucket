@@ -3,24 +3,24 @@
 
 ### Features
 
-* add `skip_cert_verification` for hooks [#19]
+* add `skip_cert_verification` for hooks [#19](https://github.com/terraform-providers/terraform-provider-bitbucket/issues/19)
 
 ### Bug fixes
 
-* handle missing hooks [#24]
-* fix default reviewer pagination bug [#28]
+* handle missing hooks [#24](https://github.com/terraform-providers/terraform-provider-bitbucket/issues/24)
+* fix default reviewer pagination bug [#28](https://github.com/terraform-providers/terraform-provider-bitbucket/issues/28)
 
 ### Dev updates
 
-* add `website` and `website-test` targets [#16]
-* add `website-test` target to Travis [#17]
-* upgrade to go 1.11 [#25]
-* switch to go modules [#27]
-* upgrade to `hashicorp/terraform` v0.12.2 [#34]
+* add `website` and `website-test` targets [#16](https://github.com/terraform-providers/terraform-provider-bitbucket/issues/16)
+* add `website-test` target to Travis [#17](https://github.com/terraform-providers/terraform-provider-bitbucket/issues/17)
+* upgrade to go 1.11 [#25](https://github.com/terraform-providers/terraform-provider-bitbucket/issues/25)
+* switch to go modules [#27](https://github.com/terraform-providers/terraform-provider-bitbucket/issues/27)
+* upgrade to `hashicorp/terraform` v0.12.2 [#34](https://github.com/terraform-providers/terraform-provider-bitbucket/issues/34)
 
 ### Documentation
 
-* add note about v1 APIs [#21]
+* add note about v1 APIs [#21](https://github.com/terraform-providers/terraform-provider-bitbucket/issues/21)
 
 ## 1.0.0 (December 08, 2017)
 
