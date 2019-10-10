@@ -10,7 +10,6 @@ import (
 type Reviewer struct {
 	DisplayName string `json:"display_name,omitempty"`
 	UUID        string `json:"uuid,omitempty"`
-	Username    string `json:"username,omitempty"`
 	Type        string `json:"type,omitempty"`
 }
 
@@ -98,7 +97,7 @@ func resourceDefaultReviewersRead(d *schema.ResourceData, m interface{}) error {
 		}
 
 		for _, reviewer := range reviewers.Values {
-			terraformReviewers = append(terraformReviewers, reviewer.Username)
+			terraformReviewers = append(terraformReviewers, reviewer.UUID)
 		}
 
 		if reviewers.Next != "" {
