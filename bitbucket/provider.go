@@ -23,9 +23,10 @@ func Provider() terraform.ResourceProvider {
 		},
 		ConfigureFunc: providerConfigure,
 		ResourcesMap: map[string]*schema.Resource{
-			"bitbucket_hook":              resourceHook(),
-			"bitbucket_default_reviewers": resourceDefaultReviewers(),
-			"bitbucket_repository":        resourceRepository(),
+			"bitbucket_hook":                resourceHook(),
+			"bitbucket_default_reviewers":   resourceDefaultReviewers(),
+			"bitbucket_repository":          resourceRepository(),
+			"bitbucket_repository_variable": resourceRepositoryVariable(),
 		},
 	}
 }
