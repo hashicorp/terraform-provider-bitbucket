@@ -6,13 +6,18 @@ import (
 	"fmt"
 	"io/ioutil"
 
-	"github.com/hashicorp/terraform/helper/schema"
 	"strings"
+
+	"github.com/hashicorp/terraform/helper/schema"
 )
 
 type CloneUrl struct {
 	Href string `json:"href,omitempty"`
 	Name string `json:"name,omitempty"`
+}
+
+type PipelinesEnabled struct {
+	Enabled bool `json:"enabled"`
 }
 
 type Repository struct {
@@ -81,6 +86,11 @@ func resourceRepository() *schema.Resource {
 				Type:     schema.TypeBool,
 				Optional: true,
 				Default:  true,
+			},
+			"pipelines_enabled": {
+				Type:     schema.TypeBool,
+				Optional: true,
+				Default:  false,
 			},
 			"fork_policy": {
 				Type:     schema.TypeString,
@@ -155,6 +165,23 @@ func resourceRepositoryUpdate(d *schema.ResourceData, m interface{}) error {
 		return err
 	}
 
+	var pipelinesEnabled bool
+	pipelinesEnabled = d.Get("pipelines_enabled").(bool)
+	pipelinesConfig := &PipelinesEnabled{Enabled: pipelinesEnabled}
+
+	bytedata, err := json.Marshal(pipelinesConfig)
+
+	if err != nil {
+		return err
+	}
+
+	_, err = client.Put(fmt.Sprintf("2.0/repositories/%s/%s/pipelines_config",
+		d.Get("owner").(string),
+		repoSlug), bytes.NewBuffer(bytedata))
+
+	if err != nil {
+		return err
+	}
 	return resourceRepositoryRead(d, m)
 }
 
@@ -182,8 +209,25 @@ func resourceRepositoryCreate(d *schema.ResourceData, m interface{}) error {
 	if err != nil {
 		return err
 	}
-
 	d.SetId(string(fmt.Sprintf("%s/%s", d.Get("owner").(string), repoSlug)))
+
+	var pipelinesEnabled bool
+	pipelinesEnabled = d.Get("pipelines_enabled").(bool)
+	pipelinesConfig := &PipelinesEnabled{Enabled: pipelinesEnabled}
+
+	bytedata, err = json.Marshal(pipelinesConfig)
+
+	if err != nil {
+		return err
+	}
+
+	_, err = client.Put(fmt.Sprintf("2.0/repositories/%s/%s/pipelines_config",
+		d.Get("owner").(string),
+		repoSlug), bytes.NewBuffer(bytedata))
+
+	if err != nil {
+		return err
+	}
 
 	return resourceRepositoryRead(d, m)
 }
@@ -246,6 +290,30 @@ func resourceRepositoryRead(d *schema.ResourceData, m interface{}) error {
 				d.Set("clone_ssh", clone_url.Href)
 			}
 		}
+		pipelinesConfigReq, err := client.Get(fmt.Sprintf("2.0/repositories/%s/%s/pipelines_config",
+			d.Get("owner").(string),
+			repoSlug))
+
+		if err != nil {
+			return err
+		}
+
+		if pipelinesConfigReq.StatusCode == 200 {
+			var pipelinesConfig PipelinesEnabled
+
+			body, readerr := ioutil.ReadAll(pipelinesConfigReq.Body)
+			if readerr != nil {
+				return readerr
+			}
+
+			decodeerr := json.Unmarshal(body, &pipelinesConfig)
+			if decodeerr != nil {
+				return decodeerr
+			}
+
+			d.Set("pipelines_enabled", pipelinesConfig.Enabled)
+		}
+
 	}
 
 	return nil
