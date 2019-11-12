@@ -27,7 +27,7 @@ func Provider() terraform.ResourceProvider {
 			"bitbucket_default_reviewers":   resourceDefaultReviewers(),
 			"bitbucket_repository":          resourceRepository(),
 			"bitbucket_repository_variable": resourceRepositoryVariable(),
-			"bitbucket_branch_restriction": resourceBranchRestriction(),
+			"bitbucket_branch_restriction":  resourceBranchRestriction(),
 		},
 	}
 }
