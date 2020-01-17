@@ -11,8 +11,9 @@ import (
 	"net/url"
 )
 
+// BranchRestriction is the data we need to send to create a new branch restriction for the repository
 type BranchRestriction struct {
-	Id      int     `json:"id,omitempty"`
+	ID      int     `json:"id,omitempty"`
 	Kind    string  `json:"kind,omitempty"`
 	Pattern string  `json:"pattern,omitempty"`
 	Value   int     `json:"value,omitempty"`
@@ -20,10 +21,12 @@ type BranchRestriction struct {
 	Groups  []Group `json:"groups,omitempty"`
 }
 
+// User is just the user struct we want to use for BranchRestrictions
 type User struct {
 	Username string `json:"username,omitempty"`
 }
 
+// Group is the group we want to add to a branch restriction
 type Group struct {
 	Slug  string `json:"slug,omitempty"`
 	Owner User   `json:"owner,omitempty"`
@@ -125,7 +128,7 @@ func createBranchRestriction(d *schema.ResourceData) *BranchRestriction {
 }
 
 func resourceBranchRestrictionsCreate(d *schema.ResourceData, m interface{}) error {
-	client := m.(*BitbucketClient)
+	client := m.(*Client)
 	branchRestriction := createBranchRestriction(d)
 
 	bytedata, err := json.Marshal(branchRestriction)
@@ -153,13 +156,13 @@ func resourceBranchRestrictionsCreate(d *schema.ResourceData, m interface{}) err
 		return decodeerr
 	}
 
-	d.SetId(string(fmt.Sprintf("%v", branchRestriction.Id)))
+	d.SetId(string(fmt.Sprintf("%v", branchRestriction.ID)))
 
 	return resourceBranchRestrictionsRead(d, m)
 }
 
 func resourceBranchRestrictionsRead(d *schema.ResourceData, m interface{}) error {
-	client := m.(*BitbucketClient)
+	client := m.(*Client)
 
 	branchRestrictionsReq, _ := client.Get(fmt.Sprintf("2.0/repositories/%s/%s/branch-restrictions/%s",
 		d.Get("owner").(string),
@@ -181,7 +184,7 @@ func resourceBranchRestrictionsRead(d *schema.ResourceData, m interface{}) error
 			return decodeerr
 		}
 
-		d.SetId(string(fmt.Sprintf("%v", branchRestriction.Id)))
+		d.SetId(string(fmt.Sprintf("%v", branchRestriction.ID)))
 		d.Set("kind", branchRestriction.Kind)
 		d.Set("pattern", branchRestriction.Pattern)
 		d.Set("value", branchRestriction.Value)
@@ -193,7 +196,7 @@ func resourceBranchRestrictionsRead(d *schema.ResourceData, m interface{}) error
 }
 
 func resourceBranchRestrictionsUpdate(d *schema.ResourceData, m interface{}) error {
-	client := m.(*BitbucketClient)
+	client := m.(*Client)
 	branchRestriction := createBranchRestriction(d)
 	payload, err := json.Marshal(branchRestriction)
 	if err != nil {
@@ -214,7 +217,7 @@ func resourceBranchRestrictionsUpdate(d *schema.ResourceData, m interface{}) err
 }
 
 func resourceBranchRestrictionsDelete(d *schema.ResourceData, m interface{}) error {
-	client := m.(*BitbucketClient)
+	client := m.(*Client)
 	_, err := client.Delete(fmt.Sprintf("2.0/repositories/%s/%s/branch-restrictions/%s",
 		d.Get("owner").(string),
 		d.Get("repository").(string),
@@ -225,7 +228,7 @@ func resourceBranchRestrictionsDelete(d *schema.ResourceData, m interface{}) err
 }
 
 func resourceBranchRestrictionsExists(d *schema.ResourceData, m interface{}) (bool, error) {
-	client := m.(*BitbucketClient)
+	client := m.(*Client)
 
 	if v := d.Id(); v != "" {
 		branchRestrictionsReq, err := client.Get(fmt.Sprintf("2.0/repositories/%s/%s/branch-restrictions/%s",

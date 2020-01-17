@@ -47,7 +47,7 @@ func TestAccBitbucketHook_basic(t *testing.T) {
 }
 
 func testAccCheckBitbucketHookDestroy(s *terraform.State) error {
-	client := testAccProvider.Meta().(*BitbucketClient)
+	client := testAccProvider.Meta().(*Client)
 	rs, ok := s.RootModule().Resources["bitbucket_hook.test_repo_hook"]
 	if !ok {
 		return fmt.Errorf("Not found %s", "bitbucket_hook.test_repo_hook")
