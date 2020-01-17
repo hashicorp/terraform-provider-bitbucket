@@ -10,6 +10,7 @@ import (
 	"strings"
 )
 
+// Project is the project data we need to send to create a project on the bitbucket api
 type Project struct {
 	Key         string `json:"key,omitempty"`
 	IsPrivate   bool   `json:"is_private,omitempty"`
@@ -64,7 +65,7 @@ func newProjectFromResource(d *schema.ResourceData) *Project {
 }
 
 func resourceProjectUpdate(d *schema.ResourceData, m interface{}) error {
-	client := m.(*BitbucketClient)
+	client := m.(*Client)
 	project := newProjectFromResource(d)
 
 	var jsonbuffer []byte
@@ -92,7 +93,7 @@ func resourceProjectUpdate(d *schema.ResourceData, m interface{}) error {
 }
 
 func resourceProjectCreate(d *schema.ResourceData, m interface{}) error {
-	client := m.(*BitbucketClient)
+	client := m.(*Client)
 	project := newProjectFromResource(d)
 
 	bytedata, err := json.Marshal(project)
@@ -138,17 +139,17 @@ func resourceProjectRead(d *schema.ResourceData, m interface{}) error {
 		projectKey = d.Get("key").(string)
 	}
 
-	client := m.(*BitbucketClient)
-	project_req, _ := client.Get(fmt.Sprintf("2.0/teams/%s/projects/%s",
+	client := m.(*Client)
+	projectReq, _ := client.Get(fmt.Sprintf("2.0/teams/%s/projects/%s",
 		d.Get("owner").(string),
 		projectKey,
 	))
 
-	if project_req.StatusCode == 200 {
+	if projectReq.StatusCode == 200 {
 
 		var project Project
 
-		body, readerr := ioutil.ReadAll(project_req.Body)
+		body, readerr := ioutil.ReadAll(projectReq.Body)
 		if readerr != nil {
 			return readerr
 		}
@@ -175,7 +176,7 @@ func resourceProjectDelete(d *schema.ResourceData, m interface{}) error {
 		projectKey = d.Get("key").(string)
 	}
 
-	client := m.(*BitbucketClient)
+	client := m.(*Client)
 	_, err := client.Delete(fmt.Sprintf("2.0/teams/%s/projects/%s",
 		d.Get("owner").(string),
 		projectKey,

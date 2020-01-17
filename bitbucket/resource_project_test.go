@@ -37,7 +37,7 @@ func TestAccBitbucketProject_basic(t *testing.T) {
 }
 
 func testAccCheckBitbucketProjectDestroy(s *terraform.State) error {
-	client := testAccProvider.Meta().(*BitbucketClient)
+	client := testAccProvider.Meta().(*Client)
 	rs, ok := s.RootModule().Resources["bitbucket_project.test_project"]
 	if !ok {
 		return fmt.Errorf("Not found %s", "bitbucket_project.test_project")
