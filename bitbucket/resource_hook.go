@@ -11,9 +11,10 @@ import (
 	"github.com/hashicorp/terraform/helper/schema"
 )
 
+// Hook is the hook you want to add to a bitbucket repository
 type Hook struct {
-	Uuid                 string   `json:"uuid,omitempty"`
-	Url                  string   `json:"url,omitempty"`
+	UUID                 string   `json:"uuid,omitempty"`
+	URL                  string   `json:"url,omitempty"`
 	Description          string   `json:"description,omitempty"`
 	Active               bool     `json:"active,omitempty"`
 	SkipCertVerification bool     `json:"skip_cert_verification,omitempty"`
@@ -80,7 +81,7 @@ func createHook(d *schema.ResourceData) *Hook {
 	}
 
 	return &Hook{
-		Url:                  d.Get("url").(string),
+		URL:                  d.Get("url").(string),
 		Description:          d.Get("description").(string),
 		Active:               d.Get("active").(bool),
 		SkipCertVerification: d.Get("skip_cert_verification").(bool),
@@ -89,7 +90,7 @@ func createHook(d *schema.ResourceData) *Hook {
 }
 
 func resourceHookCreate(d *schema.ResourceData, m interface{}) error {
-	client := m.(*BitbucketClient)
+	client := m.(*Client)
 	hook := createHook(d)
 
 	payload, err := json.Marshal(hook)
@@ -97,7 +98,7 @@ func resourceHookCreate(d *schema.ResourceData, m interface{}) error {
 		return err
 	}
 
-	hook_req, err := client.Post(fmt.Sprintf("2.0/repositories/%s/%s/hooks",
+	hookReq, err := client.Post(fmt.Sprintf("2.0/repositories/%s/%s/hooks",
 		d.Get("owner").(string),
 		d.Get("repository").(string),
 	), bytes.NewBuffer(payload))
@@ -106,7 +107,7 @@ func resourceHookCreate(d *schema.ResourceData, m interface{}) error {
 		return err
 	}
 
-	body, readerr := ioutil.ReadAll(hook_req.Body)
+	body, readerr := ioutil.ReadAll(hookReq.Body)
 	if readerr != nil {
 		return readerr
 	}
@@ -116,25 +117,29 @@ func resourceHookCreate(d *schema.ResourceData, m interface{}) error {
 		return decodeerr
 	}
 
-	d.SetId(hook.Uuid)
+	d.SetId(hook.UUID)
 
 	return resourceHookRead(d, m)
 }
 func resourceHookRead(d *schema.ResourceData, m interface{}) error {
-	client := m.(*BitbucketClient)
+	client := m.(*Client)
 
-	hook_req, _ := client.Get(fmt.Sprintf("2.0/repositories/%s/%s/hooks/%s",
+	hookReq, err := client.Get(fmt.Sprintf("2.0/repositories/%s/%s/hooks/%s",
 		d.Get("owner").(string),
 		d.Get("repository").(string),
 		url.PathEscape(d.Id()),
 	))
 
+	if err != nil {
+		return err
+	}
+
 	log.Printf("ID: %s", url.PathEscape(d.Id()))
 
-	if hook_req.StatusCode == 200 {
+	if hookReq.StatusCode == 200 {
 		var hook Hook
 
-		body, readerr := ioutil.ReadAll(hook_req.Body)
+		body, readerr := ioutil.ReadAll(hookReq.Body)
 		if readerr != nil {
 			return readerr
 		}
@@ -144,10 +149,10 @@ func resourceHookRead(d *schema.ResourceData, m interface{}) error {
 			return decodeerr
 		}
 
-		d.Set("uuid", hook.Uuid)
+		d.Set("uuid", hook.UUID)
 		d.Set("description", hook.Description)
 		d.Set("active", hook.Active)
-		d.Set("url", hook.Url)
+		d.Set("url", hook.URL)
 		d.Set("skip_cert_verification", hook.SkipCertVerification)
 
 		eventsList := make([]string, 0, len(hook.Events))
@@ -163,7 +168,7 @@ func resourceHookRead(d *schema.ResourceData, m interface{}) error {
 }
 
 func resourceHookUpdate(d *schema.ResourceData, m interface{}) error {
-	client := m.(*BitbucketClient)
+	client := m.(*Client)
 	hook := createHook(d)
 	payload, err := json.Marshal(hook)
 	if err != nil {
@@ -184,26 +189,26 @@ func resourceHookUpdate(d *schema.ResourceData, m interface{}) error {
 }
 
 func resourceHookExists(d *schema.ResourceData, m interface{}) (bool, error) {
-	client := m.(*BitbucketClient)
+	client := m.(*Client)
 	if _, okay := d.GetOk("uuid"); okay {
-		hook_req, err := client.Get(fmt.Sprintf("2.0/repositories/%s/%s/hooks/%s",
+		hookReq, err := client.Get(fmt.Sprintf("2.0/repositories/%s/%s/hooks/%s",
 			d.Get("owner").(string),
 			d.Get("repository").(string),
 			url.PathEscape(d.Id()),
 		))
 
 		if err != nil {
-			log.Printf("[DEBUG] Req: %+v, Err: %+v", hook_req, err)
+			log.Printf("[DEBUG] Req: %+v, Err: %+v", hookReq, err)
 			// If the hook was not found, we get the message "is not a valid hook".
 			// Return nil so we can show that the hook is gone.
-			if hook_req.StatusCode == 404 {
+			if hookReq.StatusCode == 404 {
 				return false, nil
 			}
 
 			panic(err)
 		}
 
-		if hook_req.StatusCode != 200 {
+		if hookReq.StatusCode != 200 {
 			return false, err
 		}
 
@@ -215,7 +220,7 @@ func resourceHookExists(d *schema.ResourceData, m interface{}) (bool, error) {
 }
 
 func resourceHookDelete(d *schema.ResourceData, m interface{}) error {
-	client := m.(*BitbucketClient)
+	client := m.(*Client)
 	_, err := client.Delete(fmt.Sprintf("2.0/repositories/%s/%s/hooks/%s",
 		d.Get("owner").(string),
 		d.Get("repository").(string),

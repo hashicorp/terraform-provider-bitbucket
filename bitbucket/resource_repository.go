@@ -11,15 +11,18 @@ import (
 	"github.com/hashicorp/terraform/helper/schema"
 )
 
-type CloneUrl struct {
+// CloneURL is the internal struct we use to represent urls
+type CloneURL struct {
 	Href string `json:"href,omitempty"`
 	Name string `json:"name,omitempty"`
 }
 
+// PipelinesEnabled is the struct we send to turn on or turn off pipelines for a repository
 type PipelinesEnabled struct {
 	Enabled bool `json:"enabled"`
 }
 
+// Repository is the struct we need to send off to the Bitbucket API to create a repository
 type Repository struct {
 	SCM         string `json:"scm,omitempty"`
 	HasWiki     bool   `json:"has_wiki,omitempty"`
@@ -36,7 +39,7 @@ type Repository struct {
 		Key string `json:"key,omitempty"`
 	} `json:"project,omitempty"`
 	Links struct {
-		Clone []CloneUrl `json:"clone,omitempty"`
+		Clone []CloneURL `json:"clone,omitempty"`
 	} `json:"links,omitempty"`
 }
 
@@ -141,7 +144,7 @@ func newRepositoryFromResource(d *schema.ResourceData) *Repository {
 }
 
 func resourceRepositoryUpdate(d *schema.ResourceData, m interface{}) error {
-	client := m.(*BitbucketClient)
+	client := m.(*Client)
 	repository := newRepositoryFromResource(d)
 
 	var jsonbuffer []byte
@@ -186,7 +189,7 @@ func resourceRepositoryUpdate(d *schema.ResourceData, m interface{}) error {
 }
 
 func resourceRepositoryCreate(d *schema.ResourceData, m interface{}) error {
-	client := m.(*BitbucketClient)
+	client := m.(*Client)
 	repo := newRepositoryFromResource(d)
 
 	bytedata, err := json.Marshal(repo)
@@ -249,17 +252,17 @@ func resourceRepositoryRead(d *schema.ResourceData, m interface{}) error {
 		repoSlug = d.Get("name").(string)
 	}
 
-	client := m.(*BitbucketClient)
-	repo_req, _ := client.Get(fmt.Sprintf("2.0/repositories/%s/%s",
+	client := m.(*Client)
+	repoReq, _ := client.Get(fmt.Sprintf("2.0/repositories/%s/%s",
 		d.Get("owner").(string),
 		repoSlug,
 	))
 
-	if repo_req.StatusCode == 200 {
+	if repoReq.StatusCode == 200 {
 
 		var repo Repository
 
-		body, readerr := ioutil.ReadAll(repo_req.Body)
+		body, readerr := ioutil.ReadAll(repoReq.Body)
 		if readerr != nil {
 			return readerr
 		}
@@ -283,11 +286,11 @@ func resourceRepositoryRead(d *schema.ResourceData, m interface{}) error {
 		d.Set("description", repo.Description)
 		d.Set("project_key", repo.Project.Key)
 
-		for _, clone_url := range repo.Links.Clone {
-			if clone_url.Name == "https" {
-				d.Set("clone_https", clone_url.Href)
+		for _, cloneURL := range repo.Links.Clone {
+			if cloneURL.Name == "https" {
+				d.Set("clone_https", cloneURL.Href)
 			} else {
-				d.Set("clone_ssh", clone_url.Href)
+				d.Set("clone_ssh", cloneURL.Href)
 			}
 		}
 		pipelinesConfigReq, err := client.Get(fmt.Sprintf("2.0/repositories/%s/%s/pipelines_config",
@@ -327,7 +330,7 @@ func resourceRepositoryDelete(d *schema.ResourceData, m interface{}) error {
 		repoSlug = d.Get("name").(string)
 	}
 
-	client := m.(*BitbucketClient)
+	client := m.(*Client)
 	_, err := client.Delete(fmt.Sprintf("2.0/repositories/%s/%s",
 		d.Get("owner").(string),
 		repoSlug,

@@ -42,7 +42,7 @@ func TestAccBitbucketBranchRestriction_basic(t *testing.T) {
 }
 
 func testAccCheckBitbucketBranchRestrictionDestroy(s *terraform.State) error {
-	client := testAccProvider.Meta().(*BitbucketClient)
+	client := testAccProvider.Meta().(*Client)
 	rs, ok := s.RootModule().Resources["bitbucket_branch_restriction.test_repo_branch_restriction"]
 	if !ok {
 		return fmt.Errorf("Not found %s", "bitbucket_branch_restriction.test_repo_branch_restriction")

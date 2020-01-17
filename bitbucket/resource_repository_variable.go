@@ -63,7 +63,7 @@ func newRepositoryVariableFromResource(d *schema.ResourceData) *RepositoryVariab
 
 func resourceRepositoryVariableCreate(d *schema.ResourceData, m interface{}) error {
 
-	client := m.(*BitbucketClient)
+	client := m.(*Client)
 	rvcr := newRepositoryVariableFromResource(d)
 	bytedata, err := json.Marshal(rvcr)
 
@@ -97,7 +97,7 @@ func resourceRepositoryVariableCreate(d *schema.ResourceData, m interface{}) err
 
 func resourceRepositoryVariableRead(d *schema.ResourceData, m interface{}) error {
 
-	client := m.(*BitbucketClient)
+	client := m.(*Client)
 	rvReq, _ := client.Get(fmt.Sprintf("2.0/repositories/%s/pipelines_config/variables/%s",
 		d.Get("repository").(string),
 		d.Get("uuid").(string),
@@ -132,7 +132,7 @@ func resourceRepositoryVariableRead(d *schema.ResourceData, m interface{}) error
 }
 
 func resourceRepositoryVariableUpdate(d *schema.ResourceData, m interface{}) error {
-	client := m.(*BitbucketClient)
+	client := m.(*Client)
 	rvcr := newRepositoryVariableFromResource(d)
 	bytedata, err := json.Marshal(rvcr)
 
@@ -156,7 +156,7 @@ func resourceRepositoryVariableUpdate(d *schema.ResourceData, m interface{}) err
 }
 
 func resourceRepositoryVariableDelete(d *schema.ResourceData, m interface{}) error {
-	client := m.(*BitbucketClient)
+	client := m.(*Client)
 	_, err := client.Delete(fmt.Sprintf(fmt.Sprintf("2.0/repositories/%s/pipelines_config/variables/%s",
 		d.Get("repository").(string),
 		d.Get("uuid").(string),

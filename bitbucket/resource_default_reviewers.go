@@ -7,12 +7,14 @@ import (
 	"github.com/hashicorp/terraform/helper/schema"
 )
 
+// Reviewer is teh default reviewer you want
 type Reviewer struct {
 	DisplayName string `json:"display_name,omitempty"`
 	UUID        string `json:"uuid,omitempty"`
 	Type        string `json:"type,omitempty"`
 }
 
+// PaginatedReviewers is a paginated list that the bitbucket api returns
 type PaginatedReviewers struct {
 	Values []Reviewer `json:"values,omitempty"`
 	Page   int        `json:"page,omitempty"`
@@ -49,7 +51,7 @@ func resourceDefaultReviewers() *schema.Resource {
 }
 
 func resourceDefaultReviewersCreate(d *schema.ResourceData, m interface{}) error {
-	client := m.(*BitbucketClient)
+	client := m.(*Client)
 
 	for _, user := range d.Get("reviewers").(*schema.Set).List() {
 		reviewerResp, err := client.PutOnly(fmt.Sprintf("2.0/repositories/%s/%s/default-reviewers/%s",
@@ -74,7 +76,7 @@ func resourceDefaultReviewersCreate(d *schema.ResourceData, m interface{}) error
 }
 
 func resourceDefaultReviewersRead(d *schema.ResourceData, m interface{}) error {
-	client := m.(*BitbucketClient)
+	client := m.(*Client)
 
 	resourceURL := fmt.Sprintf("2.0/repositories/%s/%s/default-reviewers",
 		d.Get("owner").(string),
@@ -119,7 +121,7 @@ func resourceDefaultReviewersRead(d *schema.ResourceData, m interface{}) error {
 }
 
 func resourceDefaultReviewersDelete(d *schema.ResourceData, m interface{}) error {
-	client := m.(*BitbucketClient)
+	client := m.(*Client)
 
 	for _, user := range d.Get("reviewers").(*schema.Set).List() {
 		resp, err := client.Delete(fmt.Sprintf("2.0/repositories/%s/%s/default-reviewers/%s",
