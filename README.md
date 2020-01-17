@@ -62,7 +62,7 @@ If you wish to work on the provider, you'll first need [Go](http://www.golang.or
 To compile the provider, run `make build`. This will build the provider and put the provider binary in the `$GOPATH/bin` directory.
 
 ```sh
-$ make bin
+$ make build
 ...
 $ $GOPATH/bin/terraform-provider-bitbucket
 ...
@@ -90,5 +90,3 @@ About V1 APIs
 This provider will not take any PRs about the v1 apis that dont have v2
 equivalents. Please only focus on v2 apis when adding new featues to this
 provider.
-
-There wil eventully be a blog post about the deprication of the v1 APIs.

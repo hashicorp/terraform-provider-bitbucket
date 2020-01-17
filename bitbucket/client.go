@@ -29,13 +29,16 @@ const (
 	BitbucketEndpoint string = "https://api.bitbucket.org/"
 )
 
-type BitbucketClient struct {
+// Client is the base internal Client to talk to bitbuckets API. This should be a username and password
+// the password should be a app-password.
+type Client struct {
 	Username   string
 	Password   string
 	HTTPClient *http.Client
 }
 
-func (c *BitbucketClient) Do(method, endpoint string, payload *bytes.Buffer) (*http.Response, error) {
+// Do Will just call the bitbucket api but also add auth to it and some extra headers
+func (c *Client) Do(method, endpoint string, payload *bytes.Buffer) (*http.Response, error) {
 
 	absoluteendpoint := BitbucketEndpoint + endpoint
 	log.Printf("[DEBUG] Sending request to %s %s", method, absoluteendpoint)
@@ -87,22 +90,27 @@ func (c *BitbucketClient) Do(method, endpoint string, payload *bytes.Buffer) (*h
 	return resp, err
 }
 
-func (c *BitbucketClient) Get(endpoint string) (*http.Response, error) {
+// Get is just a helper method to do but with a GET verb
+func (c *Client) Get(endpoint string) (*http.Response, error) {
 	return c.Do("GET", endpoint, nil)
 }
 
-func (c *BitbucketClient) Post(endpoint string, jsonpayload *bytes.Buffer) (*http.Response, error) {
+// Post is just a helper method to do but with a POST verb
+func (c *Client) Post(endpoint string, jsonpayload *bytes.Buffer) (*http.Response, error) {
 	return c.Do("POST", endpoint, jsonpayload)
 }
 
-func (c *BitbucketClient) Put(endpoint string, jsonpayload *bytes.Buffer) (*http.Response, error) {
+// Put is just a helper method to do but with a PUT verb
+func (c *Client) Put(endpoint string, jsonpayload *bytes.Buffer) (*http.Response, error) {
 	return c.Do("PUT", endpoint, jsonpayload)
 }
 
-func (c *BitbucketClient) PutOnly(endpoint string) (*http.Response, error) {
+// PutOnly is just a helper method to do but with a PUT verb and a nil body
+func (c *Client) PutOnly(endpoint string) (*http.Response, error) {
 	return c.Do("PUT", endpoint, nil)
 }
 
-func (c *BitbucketClient) Delete(endpoint string) (*http.Response, error) {
+// Delete is just a helper to Do but with a DELETE verb
+func (c *Client) Delete(endpoint string) (*http.Response, error) {
 	return c.Do("DELETE", endpoint, nil)
 }

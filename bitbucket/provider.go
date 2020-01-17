@@ -7,6 +7,8 @@ import (
 	"github.com/hashicorp/terraform/terraform"
 )
 
+// Provider will create the necessary terraform provider to talk to the Bitbucket APIs you should
+// specify a USERNAME and PASSWORD
 func Provider() terraform.ResourceProvider {
 	return &schema.Provider{
 		Schema: map[string]*schema.Schema{
@@ -28,12 +30,13 @@ func Provider() terraform.ResourceProvider {
 			"bitbucket_repository":          resourceRepository(),
 			"bitbucket_repository_variable": resourceRepositoryVariable(),
       "bitbucket_project":             resourceProject(),
+			"bitbucket_branch_restriction":  resourceBranchRestriction(),
 		},
 	}
 }
 
 func providerConfigure(d *schema.ResourceData) (interface{}, error) {
-	client := &BitbucketClient{
+	client := &Client{
 		Username:   d.Get("username").(string),
 		Password:   d.Get("password").(string),
 		HTTPClient: &http.Client{},

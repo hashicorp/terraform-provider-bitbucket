@@ -63,7 +63,7 @@ func TestAccBitbucketRepository_camelcase(t *testing.T) {
 }
 
 func testAccCheckBitbucketRepositoryDestroy(s *terraform.State) error {
-	client := testAccProvider.Meta().(*BitbucketClient)
+	client := testAccProvider.Meta().(*Client)
 	rs, ok := s.RootModule().Resources["bitbucket_repository.test_repo"]
 	if !ok {
 		return fmt.Errorf("Not found %s", "bitbucket_repository.test_repo")
