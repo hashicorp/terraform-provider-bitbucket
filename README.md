@@ -68,5 +68,3 @@ About V1 APIs
 This provider will not take any PRs about the v1 apis that dont have v2
 equivalents. Please only focus on v2 apis when adding new featues to this
 provider.
-
-There wil eventully be a blog post about the deprication of the v1 APIs.
