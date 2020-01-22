@@ -108,6 +108,11 @@ func resourceProjectCreate(d *schema.ResourceData, m interface{}) error {
 		projectKey = d.Get("key").(string)
 	}
 
+	owner := d.Get("owner").(string)
+	if owner == "" {
+		return fmt.Errorf("owner must not be a empty string")
+	}
+
 	_, err = client.Post(fmt.Sprintf("2.0/teams/%s/projects/",
 		d.Get("owner").(string),
 	), bytes.NewBuffer(bytedata))

@@ -13,6 +13,9 @@ func TestAccBitbucketDefaultReviewers_basic(t *testing.T) {
 
 	testUser := os.Getenv("BITBUCKET_USERNAME")
 	testAccBitbucketDefaultReviewersConfig := fmt.Sprintf(`
+		data "bitbucket_user" "reviewer" {
+			username = "%s"
+		}
 		resource "bitbucket_repository" "test_repo" {
 			owner = "%s"
 			name = "test-repo-default-reviewers"
@@ -22,7 +25,7 @@ func TestAccBitbucketDefaultReviewers_basic(t *testing.T) {
 			owner = "%s"
 			repository = "${bitbucket_repository.test_repo.name}"
 			reviewers = [
-				"%s",
+				"${data.bitbucket_user.reviewer.uuid}",
 			]
 		}
 	`, testUser, testUser, testUser)

@@ -12,14 +12,14 @@ import (
 func TestAccBitbucketProject_basic(t *testing.T) {
 	var project Project
 
-	testUser := os.Getenv("BITBUCKET_TEAM")
+	testTeam := os.Getenv("BITBUCKET_TEAM")
 	testAccBitbucketProjectConfig := fmt.Sprintf(`
 		resource "bitbucket_project" "test_project" {
 			owner = "%s"
 			name = "test-project-for-project-test"
-      key = "TESTPROJ" 
+			key = "TESTPROJ" 
 		}
-	`, testUser)
+	`, testTeam)
 
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
