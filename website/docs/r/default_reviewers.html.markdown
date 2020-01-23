@@ -8,20 +8,22 @@ description: |-
 
 # bitbucket\_default_reviewers
 
-Provides support for setting up default reviewers for your repository.
+Provides support for setting up default reviewers for your repository. You must however have the UUID of the user available. Since Bitbucket has removed usernames from its APIs the best case is to use the UUID via the data provider.
 
 ## Example Usage
 
 ```hcl
 # Manage your repositories default reviewers
+data "bitbucket_user" "reviewer" {
+  username = "gob"
+}
+
 resource "bitbucket_default_reviewers" "infrastructure" {
   owner      = "myteam"
   repository = "terraform-code"
 
   reviewers = [
-    "gob",
-    "michael",
-    "michalejr",
+    "${data.bitbucket_user.reviewer.uuid}",
   ]
 }
 ```
