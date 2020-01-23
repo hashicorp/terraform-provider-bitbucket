@@ -55,6 +55,7 @@ The following arguments are supported:
 * `fork_policy` - (Optional) What the fork policy should be. Defaults to
   allow_forks.
 * `description` - (Optional) What the description of the repo is.
+* `pipelines_enabled` - (Optional) Turn on to enable pipelines support
 
 ## Computed Arguments
 
