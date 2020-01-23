@@ -1,3 +1,4 @@
+## 1.2.1 (Unreleased)
 ## 1.2.0 (January 23, 2020)
 * add `bitbucket_project` to create a new project via the API
 * add `bitbucket_repository` turn on/off pipelines
