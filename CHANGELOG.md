@@ -1,4 +1,9 @@
 ## 1.2.0 (Unreleased)
+* add `bitbucket_project` to create a new project via the API
+* add `bitbucket_repository` turn on/off pipelines
+* add `bitbucket_repository_variable` to add variables via terraform to your pipelines builds
+* add `bitbucket_user` to find a user and use for default reviewers.
+
 ## 1.1.0 (June 19, 2019)
 
 ### Features
