@@ -31,6 +31,8 @@ func Provider() terraform.ResourceProvider {
 			"bitbucket_repository_variable": resourceRepositoryVariable(),
 			"bitbucket_project":             resourceProject(),
 			"bitbucket_branch_restriction":  resourceBranchRestriction(),
+			"bitbucket_user_ssh_key":          resourceSshKey(),
+			"bitbucket_repository_deploy_key": resourceRepositoryDeployKey(),
 		},
 		DataSourcesMap: map[string]*schema.Resource{
 			"bitbucket_user": dataUser(),
