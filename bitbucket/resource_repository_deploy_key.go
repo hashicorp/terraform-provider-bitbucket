@@ -52,6 +52,7 @@ func resourceRepositoryDeployKey() *schema.Resource {
 			"label": {
 				Type:        schema.TypeString,
 				Optional:    true,
+				Default:     "Managed by Terraform",
 				Description: "The label for the key to be shown in Bitbucket",
 			},
 		},
