@@ -9,11 +9,6 @@ import (
 	"strings"
 )
 
-type Owner struct {
-	AccountId string `json:"account_id"`
-	UUID      string `json:"uuid"`
-}
-
 type SshKey struct {
 	UUID    string `json:"uuid,omitempty"`
 	Key     string `json:"key,omitempty"`
@@ -35,25 +30,23 @@ func resourceSshKey() *schema.Resource {
 
 		Schema: map[string]*schema.Schema{
 			"owner": {
-				Type: schema.TypeString,
-				Description: `This can either be the username, the 'account_id'
-							  or the UUID of the account (surrounded by curly-braces, for example: {UUID}).
-							  An account is either a team or user.`,
-				Required: true,
-				ForceNew: true,
+				Type:        schema.TypeString,
+				Required:    true,
+				ForceNew:    true,
+				Description: `Username or UUID of the owner of the key`,
 			},
 			"key": {
 				Type:         schema.TypeString,
-				Description:  `SSH public key in OpenSSH 'authorized_keys' format.`,
 				Required:     true,
 				ForceNew:     true,
 				ValidateFunc: validateKey,
+				Description:  `SSH public key in OpenSSH 'authorized_keys' format`,
 			},
 			"label": {
 				Type:        schema.TypeString,
-				Description: `Label for this key`,
 				Optional:    true,
 				Default:     "Managed by Terraform",
+				Description: `Label for this key`,
 			},
 		},
 	}

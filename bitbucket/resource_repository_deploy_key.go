@@ -35,21 +35,24 @@ func resourceRepositoryDeployKey() *schema.Resource {
 				Required:     true,
 				ForceNew:     true,
 				ValidateFunc: validateKey,
+				Description:  "The key in OpenSSH authorized_keys format",
 			},
 			"owner": {
-				Type:     schema.TypeString,
-				Required: true,
-				ForceNew: true,
+				Type:        schema.TypeString,
+				Required:    true,
+				ForceNew:    true,
+				Description: "The owner of the repository (user or team)",
 			},
-			"repository": {
-				Type:     schema.TypeString,
-				Required: true,
-				ForceNew: true,
+			"repo_slug": {
+				Type:        schema.TypeString,
+				Required:    true,
+				ForceNew:    true,
+				Description: "The repository slug",
 			},
 			"label": {
-				Type:     schema.TypeString,
-				Optional: true,
-				Default:  "Managed by Terraform",
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "The label for the key to be shown in Bitbucket",
 			},
 		},
 	}
@@ -70,7 +73,7 @@ func createDeployKey(d *schema.ResourceData) (*DeployKey, error) {
 		Key:        key,
 		Comment:    comment,
 		Owner:      d.Get("owner").(string),
-		Repository: d.Get("repository").(string),
+		Repository: d.Get("repo_slug").(string),
 	}, nil
 }
 

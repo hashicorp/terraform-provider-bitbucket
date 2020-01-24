@@ -19,10 +19,10 @@ func TestAccBitbucketDeployKey_basic(t *testing.T) {
 			name  = "test-repo-for-deployment-key-test"
 		}
 		resource bitbucket_repository_deploy_key test_deploy_key {
-			owner      = bitbucket_repository.test_repo.owner
-			repository = bitbucket_repository.test_repo.slug
-			key        = "%s"
-			label      = "%s"
+			owner     = bitbucket_repository.test_repo.owner
+			repo_slug = bitbucket_repository.test_repo.slug
+			key       = "%s"
+			label     = "%s"
 		}
 	`
 
@@ -68,7 +68,7 @@ func testAccCheckBitbucketDeployKeyDestroy(s *terraform.State) error {
 	response, err := client.Get(fmt.Sprintf(
 		"2.0/repositories/%s/%s/deploy-keys/%s",
 		rs.Primary.Attributes["owner"],
-		rs.Primary.Attributes["repository"],
+		rs.Primary.Attributes["repo_slug"],
 		url.PathEscape(rs.Primary.Attributes["uuid"])))
 
 	if err == nil {
