@@ -33,11 +33,3 @@ The following arguments are supported:
 * `owner` - (Required) The owner of the repository. Can be a user or a team.
 * `repo_slug` - (Required) The repository slug.
 * `label` - (Optional) The label for the key to be shown in Bitbucket.
-
-## Computed Arguments
-
-None.
-
-## Import
-
-Repository deploy keys cannot be imported.

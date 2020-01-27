@@ -33,11 +33,3 @@ The following arguments are supported:
             This can either be the username or the UUID of the account,
             surrounded by curly-braces, for example: {account UUID}.
 * `label` - (Optional) The label for the key to be shown in Bitbucket.
-
-## Computed Arguments
-
-None.
-
-## Import
-
-Repository deploy keys cannot be imported.
