@@ -16,8 +16,8 @@ type Hook struct {
 	UUID                 string   `json:"uuid,omitempty"`
 	URL                  string   `json:"url,omitempty"`
 	Description          string   `json:"description,omitempty"`
-	Active               bool     `json:"active,omitempty"`
-	SkipCertVerification bool     `json:"skip_cert_verification,omitempty"`
+	Active               bool     `json:"active"`
+	SkipCertVerification bool     `json:"skip_cert_verification"`
 	Events               []string `json:"events,omitempty"`
 }
 
