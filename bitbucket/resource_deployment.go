@@ -12,8 +12,8 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 )
 
-// RepositoryEnvironment structure for handling key info
-type RepositoryEnvironment struct {
+// Deployment structure for handling key info
+type Deployment struct {
 	Name  string `json:"name"`
 	Stage *Stage `json:"environment_type"`
 	UUID  string `json:"uuid,omitempty"`
@@ -23,12 +23,12 @@ type Stage struct {
 	Name string `json:"name"`
 }
 
-func resourceRepositoryEnvironment() *schema.Resource {
+func resourceDeployment() *schema.Resource {
 	return &schema.Resource{
-		Create: resourceRepositoryEnvironmentCreate,
-		Update: resourceRepositoryEnvironmentUpdate,
-		Read:   resourceRepositoryEnvironmentRead,
-		Delete: resourceRepositoryEnvironmentDelete,
+		Create: resourceDeploymentCreate,
+		Update: resourceDeploymentUpdate,
+		Read:   resourceDeploymentRead,
+		Delete: resourceDeploymentDelete,
 
 		Schema: map[string]*schema.Schema{
 			"uuid": {
@@ -57,8 +57,8 @@ func resourceRepositoryEnvironment() *schema.Resource {
 	}
 }
 
-func newRepositoryEnvironmentFromResource(d *schema.ResourceData) *RepositoryEnvironment {
-	dk := &RepositoryEnvironment{
+func newDeploymentFromResource(d *schema.ResourceData) *Deployment {
+	dk := &Deployment{
 		Name: d.Get("name").(string),
 		Stage: &Stage{
 			Name: d.Get("stage").(string),
@@ -67,10 +67,10 @@ func newRepositoryEnvironmentFromResource(d *schema.ResourceData) *RepositoryEnv
 	return dk
 }
 
-func resourceRepositoryEnvironmentCreate(d *schema.ResourceData, m interface{}) error {
+func resourceDeploymentCreate(d *schema.ResourceData, m interface{}) error {
 
 	client := m.(*Client)
-	rvcr := newRepositoryEnvironmentFromResource(d)
+	rvcr := newDeploymentFromResource(d)
 	bytedata, err := json.Marshal(rvcr)
 
 	if err != nil {
@@ -84,24 +84,24 @@ func resourceRepositoryEnvironmentCreate(d *schema.ResourceData, m interface{}) 
 		return err
 	}
 
-	var repositoryEnvironment RepositoryEnvironment
+	var deployment Deployment
 
 	body, readerr := ioutil.ReadAll(req.Body)
 	if readerr != nil {
 		return readerr
 	}
 
-	decodeerr := json.Unmarshal(body, &repositoryEnvironment)
+	decodeerr := json.Unmarshal(body, &deployment)
 	if decodeerr != nil {
 		return decodeerr
 	}
-	d.Set("uuid", repositoryEnvironment.UUID)
-	d.SetId(fmt.Sprintf("%s:%s", d.Get("repository"), repositoryEnvironment.UUID))
+	d.Set("uuid", deployment.UUID)
+	d.SetId(fmt.Sprintf("%s:%s", d.Get("repository"), deployment.UUID))
 
-	return resourceRepositoryEnvironmentRead(d, m)
+	return resourceDeploymentRead(d, m)
 }
 
-func resourceRepositoryEnvironmentRead(d *schema.ResourceData, m interface{}) error {
+func resourceDeploymentRead(d *schema.ResourceData, m interface{}) error {
 
 	client := m.(*Client)
 	rvReq, _ := client.Get(fmt.Sprintf("2.0/repositories/%s/environments/%s",
@@ -112,20 +112,20 @@ func resourceRepositoryEnvironmentRead(d *schema.ResourceData, m interface{}) er
 	log.Printf("ID: %s", url.PathEscape(d.Id()))
 
 	if rvReq.StatusCode == 200 {
-		var repositoryEnvironment RepositoryEnvironment
+		var Deployment Deployment
 		body, readerr := ioutil.ReadAll(rvReq.Body)
 		if readerr != nil {
 			return readerr
 		}
 
-		decodeerr := json.Unmarshal(body, &repositoryEnvironment)
+		decodeerr := json.Unmarshal(body, &Deployment)
 		if decodeerr != nil {
 			return decodeerr
 		}
 
-		d.Set("uuid", repositoryEnvironment.UUID)
-		d.Set("name", repositoryEnvironment.Name)
-		d.Set("stage", repositoryEnvironment.Stage.Name)
+		d.Set("uuid", Deployment.UUID)
+		d.Set("name", Deployment.Name)
+		d.Set("stage", Deployment.Stage.Name)
 	}
 
 	if rvReq.StatusCode == 404 {
@@ -136,9 +136,9 @@ func resourceRepositoryEnvironmentRead(d *schema.ResourceData, m interface{}) er
 	return nil
 }
 
-func resourceRepositoryEnvironmentUpdate(d *schema.ResourceData, m interface{}) error {
+func resourceDeploymentUpdate(d *schema.ResourceData, m interface{}) error {
 	client := m.(*Client)
-	rvcr := newRepositoryEnvironmentFromResource(d)
+	rvcr := newDeploymentFromResource(d)
 	bytedata, err := json.Marshal(rvcr)
 
 	if err != nil {
@@ -157,10 +157,10 @@ func resourceRepositoryEnvironmentUpdate(d *schema.ResourceData, m interface{}) 
 		return nil
 	}
 
-	return resourceRepositoryEnvironmentRead(d, m)
+	return resourceDeploymentRead(d, m)
 }
 
-func resourceRepositoryEnvironmentDelete(d *schema.ResourceData, m interface{}) error {
+func resourceDeploymentDelete(d *schema.ResourceData, m interface{}) error {
 	client := m.(*Client)
 	_, err := client.Delete(fmt.Sprintf(fmt.Sprintf("2.0/repositories/%s/environments/%s",
 		d.Get("repository").(string),

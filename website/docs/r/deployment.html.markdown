@@ -1,13 +1,13 @@
 ---
 layout: "bitbucket"
-page_title: "Bitbucket: bitbucket_repository_environment"
-sidebar_current: "docs-bitbucket-resource-repository-environment"
+page_title: "Bitbucket: bitbucket_deployment"
+sidebar_current: "docs-bitbucket-resource-deployment"
 description: |-
-  Manage your pipelines repository environments
+  Manage your pipelines repository deployment environments
 ---
 
 
-# bitbucket\_repository\_environment
+# bitbucket\_deployment
 
 This resource allows you to setup pipelines environments.
 
@@ -20,7 +20,7 @@ resource "bitbucket_repository" "monorepo" {
     pipelines_enabled = true
 }
 
-resource "bitbucket_environment" "test" {
+resource "bitbucket_deployment" "test" {
   repository = bitbucket_repository.monorepo.id
   name = "test"
   stage = "Test"

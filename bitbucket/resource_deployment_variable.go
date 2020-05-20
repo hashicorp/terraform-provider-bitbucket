@@ -8,6 +8,7 @@ import (
 	"log"
 	"net/url"
 	"strings"
+	"time"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 )
@@ -53,7 +54,7 @@ func resourceDeploymentVariable() *schema.Resource {
 				Optional: true,
 				Default:  false,
 			},
-			"environment": {
+			"deployment": {
 				Type:     schema.TypeString,
 				Required: true,
 			},
@@ -70,7 +71,7 @@ func newDeploymentVariableFromResource(d *schema.ResourceData) *DeploymentVariab
 	return dk
 }
 
-func parseEnvironmentId(str string) (repository string, environment string) {
+func parseDeploymentId(str string) (repository string, deployment string) {
 	parts := strings.SplitN(str, ":", 2)
 	return parts[0], parts[1]
 }
@@ -84,10 +85,10 @@ func resourceDeploymentVariableCreate(d *schema.ResourceData, m interface{}) err
 	if err != nil {
 		return err
 	}
-	repository, environment := parseEnvironmentId(d.Get("environment").(string))
+	repository, deployment := parseDeploymentId(d.Get("deployment").(string))
 	req, err := client.Post(fmt.Sprintf("2.0/repositories/%s/deployments_config/environments/%s/variables",
 		repository,
-		environment,
+		deployment,
 	), bytes.NewBuffer(bytedata))
 
 	if err != nil {
@@ -108,16 +109,17 @@ func resourceDeploymentVariableCreate(d *schema.ResourceData, m interface{}) err
 	d.Set("uuid", rv.UUID)
 	d.SetId(rv.Key)
 
+	time.Sleep(5000 * time.Millisecond) // sleep for a while, to allow BitBucket cache to catch up
 	return resourceDeploymentVariableRead(d, m)
 }
 
 func resourceDeploymentVariableRead(d *schema.ResourceData, m interface{}) error {
 
-	repository, environment := parseEnvironmentId(d.Get("environment").(string))
+	repository, deployment := parseDeploymentId(d.Get("deployment").(string))
 	client := m.(*Client)
 	rvReq, _ := client.Get(fmt.Sprintf("2.0/repositories/%s/deployments_config/environments/%s/variables",
 		repository,
-		environment,
+		deployment,
 	))
 
 	log.Printf("ID: %s", url.PathEscape(d.Id()))
@@ -167,10 +169,10 @@ func resourceDeploymentVariableUpdate(d *schema.ResourceData, m interface{}) err
 	if err != nil {
 		return err
 	}
-	repository, environment := parseEnvironmentId(d.Get("environment").(string))
+	repository, deployment := parseDeploymentId(d.Get("deployment").(string))
 	req, err := client.Put(fmt.Sprintf("2.0/repositories/%s/deployments_config/environments/%s/variables/%s",
 		repository,
-		environment,
+		deployment,
 		d.Get("uuid").(string),
 	), bytes.NewBuffer(bytedata))
 
@@ -186,11 +188,11 @@ func resourceDeploymentVariableUpdate(d *schema.ResourceData, m interface{}) err
 }
 
 func resourceDeploymentVariableDelete(d *schema.ResourceData, m interface{}) error {
-	repository, environment := parseEnvironmentId(d.Get("environment").(string))
+	repository, deployment := parseDeploymentId(d.Get("deployment").(string))
 	client := m.(*Client)
 	_, err := client.Delete(fmt.Sprintf(fmt.Sprintf("2.0/repositories/%s/deployments_config/environments/%s/variables/%s",
 		repository,
-		environment,
+		deployment,
 		d.Get("uuid").(string),
 	)))
 	return err
