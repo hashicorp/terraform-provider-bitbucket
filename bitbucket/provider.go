@@ -3,8 +3,8 @@ package bitbucket
 import (
 	"net/http"
 
-	"github.com/hashicorp/terraform/helper/schema"
-	"github.com/hashicorp/terraform/terraform"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/terraform"
 )
 
 // Provider will create the necessary terraform provider to talk to the Bitbucket APIs you should
@@ -31,6 +31,8 @@ func Provider() terraform.ResourceProvider {
 			"bitbucket_repository_variable": resourceRepositoryVariable(),
 			"bitbucket_project":             resourceProject(),
 			"bitbucket_branch_restriction":  resourceBranchRestriction(),
+			"bitbucket_environment":         resourceRepositoryEnvironment(),
+			"bitbucket_deployment_variable": resourceDeploymentVariable(),
 		},
 		DataSourcesMap: map[string]*schema.Resource{
 			"bitbucket_user": dataUser(),

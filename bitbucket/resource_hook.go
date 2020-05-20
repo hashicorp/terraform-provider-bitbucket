@@ -8,7 +8,7 @@ import (
 	"log"
 	"net/url"
 
-	"github.com/hashicorp/terraform/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 )
 
 // Hook is the hook you want to add to a bitbucket repository

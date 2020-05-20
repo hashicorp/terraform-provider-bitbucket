@@ -17,7 +17,7 @@ This resource allows you to setup pipelines variables to manage your builds with
 resource "bitbucket_repository" "monorepo" {
     owner = "gob"
     name = "illusions"
-    pipelines_enable = true
+    pipelines_enabled = true
 }
 
 resource "bitbucket_repository_variable" "debug" {
@@ -33,6 +33,6 @@ resource "bitbucket_repository_variable" "debug" {
 * `key` - (Required) The key of the key value pair
 * `value` - (Required) The value of the key
 * `repository` - (Required) The repository ID you want to put this variable onto.
-* `secuired` - (Optional) If you want to make this viewable in the UI.
+* `secured` - (Optional) If you want to make this viewable in the UI.
 
 * `uuid` - (Computed) The UUID of the variable
