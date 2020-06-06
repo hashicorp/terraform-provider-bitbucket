@@ -42,7 +42,7 @@ func resourceRepositoryVariable() *schema.Resource {
 			"secured": {
 				Type:     schema.TypeBool,
 				Optional: true,
-				Default:  true,
+				Default:  false,
 			},
 			"repository": {
 				Type:     schema.TypeString,
