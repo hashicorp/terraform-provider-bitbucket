@@ -45,8 +45,9 @@ func resourceDeploymentVariable() *schema.Resource {
 				Required: true,
 			},
 			"value": {
-				Type:     schema.TypeString,
-				Required: true,
+				Type:      schema.TypeString,
+				Required:  true,
+				Sensitive: true,
 			},
 			"secured": {
 				Type:     schema.TypeBool,
