@@ -33,7 +33,8 @@ func Provider() terraform.ResourceProvider {
 			"bitbucket_branch_restriction":  resourceBranchRestriction(),
 		},
 		DataSourcesMap: map[string]*schema.Resource{
-			"bitbucket_user": dataUser(),
+			"bitbucket_user":       dataUser(),
+			"bitbucket_repository": dataRepository(),
 		},
 	}
 }
