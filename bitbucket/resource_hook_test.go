@@ -1,13 +1,16 @@
 package bitbucket
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/url"
 	"os"
+	"strings"
 	"testing"
 
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
+	uuid "github.com/satori/go.uuid"
 )
 
 func TestAccBitbucketHook_basic(t *testing.T) {
@@ -44,6 +47,33 @@ func TestAccBitbucketHook_basic(t *testing.T) {
 			},
 		},
 	})
+}
+
+func TestEncodesJsonCompletely(t *testing.T) {
+	hook := &Hook{
+		UUID:        uuid.NewV4().String(),
+		URL:         "https://site.internal/",
+		Description: "Test description",
+		Active:      false,
+		Events: []string{
+			"pullrequests:updated",
+		},
+		SkipCertVerification: false,
+	}
+
+	payload, err := json.Marshal(hook)
+	if err != nil {
+		t.Logf("Failed to encode hook, %s\n", err)
+		t.FailNow() // Can't continue test.
+	}
+
+	if !strings.Contains(string(payload), `"active":false`) {
+		t.Error("Did not render active.")
+	}
+
+	if !strings.Contains(string(payload), `"skip_cert_verification":false`) {
+		t.Error("Did not render skip_cert_verification.")
+	}
 }
 
 func testAccCheckBitbucketHookDestroy(s *terraform.State) error {
