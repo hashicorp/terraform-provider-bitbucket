@@ -32,7 +32,7 @@ The following arguments are supported:
 * `owner` - (Required) The owner of this repository. Can be you or any team you
   have write access to.
 * `repository` - (Required) The name of the repository.
-* `kind` - (Required) The type of restriction that is being applied. List of possible stages is [here](https://developer.atlassian.com/bitbucket/api/2/reference/resource/repositories/%7Busername%7D/%7Brepo_slug%7D/branch-restrictions).
+* `kind` - (Required) The type of restriction that is being applied. List of possible stages is [here](https://developer.atlassian.com/bitbucket/api/2/reference/resource/repositories/%7Bworkspace%7D/%7Brepo_slug%7D/branch-restrictions/%7Bid%7Da).
 * `pattern` - (Required) The pattern to determine which branches will be restricted.
 * `users` - (Optional) A list of users to use.
 * `groups` - (Optional) A list of groups to use.
