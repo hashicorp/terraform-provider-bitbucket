@@ -65,6 +65,7 @@ func resourceBranchRestriction() *schema.Resource {
 					"restrict_merges",
 					"reset_pullrequest_approvals_on_change",
 					"delete",
+					"require_default_reviewer_approvals_to_merge",
 				},
 					false),
 			},
