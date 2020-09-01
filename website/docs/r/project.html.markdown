@@ -31,3 +31,11 @@ The following arguments are supported:
 * `key` - (Required) The key used for this project
 * `description` - (Optional) The description of the project
 * `is_private` - (Optional) If you want to keep the project private - defaults to true
+
+## Import
+
+Projects can be imported using their `owner/name` ID, e.g.
+
+```
+$ terraform import bitbucket_project.my-repo my-account/my-project
+```
