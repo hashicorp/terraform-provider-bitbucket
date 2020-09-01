@@ -54,6 +54,9 @@ resource "bitbucket_project" "infrastructure" {
 }
 ```
 
+If `username` or `password` are not given, they'll be fetched from environment
+variables `BITBUCKET_USERNAME` and `BITBUCKET_PASSWORD`.
+
 Developing the Provider
 ---------------------------
 
