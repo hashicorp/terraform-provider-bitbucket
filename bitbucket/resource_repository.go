@@ -43,6 +43,76 @@ type Repository struct {
 	} `json:"links,omitempty"`
 }
 
+var RepositorySchema = map[string]*schema.Schema{
+	"scm": {
+		Type:     schema.TypeString,
+		Optional: true,
+		Default:  "git",
+	},
+	"has_wiki": {
+		Type:     schema.TypeBool,
+		Optional: true,
+		Default:  false,
+	},
+	"has_issues": {
+		Type:     schema.TypeBool,
+		Optional: true,
+		Default:  false,
+	},
+	"website": {
+		Type:     schema.TypeString,
+		Optional: true,
+	},
+	"clone_ssh": {
+		Type:     schema.TypeString,
+		Computed: true,
+	},
+	"clone_https": {
+		Type:     schema.TypeString,
+		Computed: true,
+	},
+	"project_key": {
+		Type:     schema.TypeString,
+		Optional: true,
+	},
+	"is_private": {
+		Type:     schema.TypeBool,
+		Optional: true,
+		Default:  true,
+	},
+	"pipelines_enabled": {
+		Type:     schema.TypeBool,
+		Optional: true,
+		Default:  false,
+	},
+	"fork_policy": {
+		Type:     schema.TypeString,
+		Optional: true,
+		Default:  "allow_forks",
+	},
+	"language": {
+		Type:     schema.TypeString,
+		Optional: true,
+	},
+	"description": {
+		Type:     schema.TypeString,
+		Optional: true,
+	},
+	"owner": {
+		Type:     schema.TypeString,
+		Required: true,
+	},
+	"name": {
+		Type:     schema.TypeString,
+		Required: true,
+	},
+	"slug": {
+		Type:     schema.TypeString,
+		Optional: true,
+		Computed: true,
+	},
+}
+
 func resourceRepository() *schema.Resource {
 	return &schema.Resource{
 		Create: resourceRepositoryCreate,
@@ -53,75 +123,7 @@ func resourceRepository() *schema.Resource {
 			State: schema.ImportStatePassthrough,
 		},
 
-		Schema: map[string]*schema.Schema{
-			"scm": {
-				Type:     schema.TypeString,
-				Optional: true,
-				Default:  "git",
-			},
-			"has_wiki": {
-				Type:     schema.TypeBool,
-				Optional: true,
-				Default:  false,
-			},
-			"has_issues": {
-				Type:     schema.TypeBool,
-				Optional: true,
-				Default:  false,
-			},
-			"website": {
-				Type:     schema.TypeString,
-				Optional: true,
-			},
-			"clone_ssh": {
-				Type:     schema.TypeString,
-				Computed: true,
-			},
-			"clone_https": {
-				Type:     schema.TypeString,
-				Computed: true,
-			},
-			"project_key": {
-				Type:     schema.TypeString,
-				Optional: true,
-			},
-			"is_private": {
-				Type:     schema.TypeBool,
-				Optional: true,
-				Default:  true,
-			},
-			"pipelines_enabled": {
-				Type:     schema.TypeBool,
-				Optional: true,
-				Default:  false,
-			},
-			"fork_policy": {
-				Type:     schema.TypeString,
-				Optional: true,
-				Default:  "allow_forks",
-			},
-			"language": {
-				Type:     schema.TypeString,
-				Optional: true,
-			},
-			"description": {
-				Type:     schema.TypeString,
-				Optional: true,
-			},
-			"owner": {
-				Type:     schema.TypeString,
-				Required: true,
-			},
-			"name": {
-				Type:     schema.TypeString,
-				Required: true,
-			},
-			"slug": {
-				Type:     schema.TypeString,
-				Optional: true,
-				Computed: true,
-			},
-		},
+		Schema: RepositorySchema,
 	}
 }
 
@@ -234,6 +236,7 @@ func resourceRepositoryCreate(d *schema.ResourceData, m interface{}) error {
 
 	return resourceRepositoryRead(d, m)
 }
+
 func resourceRepositoryRead(d *schema.ResourceData, m interface{}) error {
 	id := d.Id()
 	if id != "" {
