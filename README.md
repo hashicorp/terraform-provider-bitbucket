@@ -63,6 +63,9 @@ resource "bitbucket_project" "infrastructure" {
 }
 ```
 
+If `username` or `password` are not given, they'll be fetched from environment
+variables `BITBUCKET_USERNAME` and `BITBUCKET_PASSWORD`.
+
 Developing the Provider
 ---------------------------
 
@@ -96,6 +99,6 @@ $ make testacc
 About V1 APIs
 ------------------
 
-This provider will not take any PRs about the v1 apis that dont have v2
-equivalents. Please only focus on v2 apis when adding new featues to this
+This provider will not take any PRs about the v1 apis that don't have v2
+equivalents. Please only focus on v2 apis when adding new features to this
 provider.
